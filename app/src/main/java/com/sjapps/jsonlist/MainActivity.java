@@ -498,7 +498,8 @@ public class MainActivity extends AppCompatActivity {
                 if (rawJsonView.showJson){
                     rawJsonView.ShowJSON();
                 }
-            }
+            }else if (unsavedChanges)
+                saveBtn.setVisibility(VISIBLE);
         }
 
         adapter.setEditMode(isEditMode);
