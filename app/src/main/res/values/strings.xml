@@ -86,10 +86,10 @@
     <!--  Release Notes  -->
     <string name="release_notes">Release Notes</string>
     <string name="fail_to_get_data">Fail to get data</string>
-  
+
     <!--  Search  -->
     <string name="search">search</string>
-  
+
     <!-- Editing -->
     <string name="editing_in_progress">Editing in progress</string>
     <string name="item_with_name_already_exists">Item with this name already exists!</string>
@@ -97,7 +97,7 @@
     <string name="editing_root_item_not_available">Editing a root item is not available!</string>
     <string name="rename_all">Rename all</string>
     <string name="rename_all_s_key_with_s">Rename all \'%s\' key with \'%s\'?</string>
-    
+
 
     <!--  Themes  -->
     <string name="theme">Theme</string>
@@ -108,4 +108,21 @@
         <item>Light</item>
         <item>Dark</item>
     </string-array>
+
+    <!--  Feedback  -->
+    <string name="feedback_dialog_title">We’d Love Your Feedback</string>
+    <string name="feedback_dialog_message">Tell us what you like, what doesn’t work, or what we should add next.</string>
+    <string name="send">Send</string>
+    <string name="select_category">Select category!</string>
+    <string name="empty_text_field">The text field is empty!</string>
+
+    <string-array name="feedback_categories">
+        <item>Select category</item>
+        <item>Bug Report</item>
+        <item>Feature Request</item>
+        <item>App Performance</item>
+        <item>Design &amp; User Interface</item>
+        <item>General Feedback</item>
+    </string-array>
+
 </resources>
