@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.sj14apps.jsonlist.core.JsonData;
 import com.sj14apps.jsonlist.core.SearchItem;
 import com.sjapps.jsonlist.MainActivity;
-import com.sjapps.jsonlist.R;
+import com.sjapps.jsonlist.databinding.ListSearchLayoutBinding;
 
 import java.util.ArrayList;
 
@@ -25,24 +25,21 @@ public class SearchListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
     static class ViewHolder extends RecyclerView.ViewHolder{
 
-        TextView valTxt;
-        TextView pathTxt;
-        View btn;
+        ListSearchLayoutBinding binding;
 
-        public ViewHolder(View itemView) {
-            super(itemView);
-            valTxt = itemView.findViewById(R.id.itemValue);
-            pathTxt = itemView.findViewById(R.id.itemPath);
-            btn = itemView.findViewById(R.id.btn);
+        public ViewHolder(ListSearchLayoutBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
+
         }
         public TextView getValTxt(){
-            return valTxt;
+            return binding.itemValue;
         }
         public TextView getPathTxt(){
-            return pathTxt;
+            return binding.itemPath;
         }
         public View getBtn(){
-            return btn;
+            return binding.btn;
         }
 
         public View getView(){
@@ -60,8 +57,8 @@ public class SearchListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_search_layout,parent,false);
-        return new ViewHolder(view);
+        ListSearchLayoutBinding binding = ListSearchLayoutBinding.inflate(LayoutInflater.from(parent.getContext()),parent,false);
+        return new ViewHolder(binding);
     }
 
     @Override

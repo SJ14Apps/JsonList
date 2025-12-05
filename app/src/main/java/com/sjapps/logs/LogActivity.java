@@ -25,6 +25,7 @@ import com.google.gson.Gson;
 import com.sj14apps.jsonlist.core.AppState;
 import com.sjapps.jsonlist.FileSystem;
 import com.sjapps.jsonlist.R;
+import com.sjapps.jsonlist.databinding.ActivityLogBinding;
 import com.sjapps.jsonlist.functions;
 import com.sjapps.library.customdialog.BasicDialog;
 import com.sjapps.library.customdialog.ListDialog;
@@ -35,6 +36,7 @@ import java.util.Calendar;
 
 public class LogActivity extends AppCompatActivity {
 
+    private ActivityLogBinding binding;
     TextView logTxt;
     String exportFileName = "logFile.txt";
     int numberOfLogs = 0;
@@ -42,9 +44,11 @@ public class LogActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_log);
+        binding = ActivityLogBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+
         EdgeToEdge.enable(this);
-        logTxt = findViewById(R.id.logTxt);
+        logTxt = binding.logTxt;
         setLayoutBounds();
         update();
 
@@ -58,7 +62,7 @@ public class LogActivity extends AppCompatActivity {
     }
 
     private void setLayoutBounds() {
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.rootView), (v, windowInsets) -> {
+        ViewCompat.setOnApplyWindowInsetsListener(binding.rootView, (v, windowInsets) -> {
             Insets insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars());
             Insets insetsN = windowInsets.getInsets(WindowInsetsCompat.Type.displayCutout());
 

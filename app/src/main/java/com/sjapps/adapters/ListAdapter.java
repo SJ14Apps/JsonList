@@ -13,6 +13,9 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.sjapps.jsonlist.databinding.ListLayout2Binding;
+import com.sjapps.jsonlist.databinding.ListLayoutBinding;
+import com.sjapps.jsonlist.databinding.SpaceLayoutBinding;
 import com.sjapps.jsonlist.functions;
 import com.sj14apps.jsonlist.core.JsonData;
 import com.sj14apps.jsonlist.core.ListItem;
@@ -34,15 +37,18 @@ public class ListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
 
     static class ViewHolderShort extends RecyclerView.ViewHolder{
+        ListLayoutBinding binding;
 
-        TextView title;
-
-        public ViewHolderShort(View itemView) {
-            super(itemView);
-            title =  itemView.findViewById(R.id.itemName);
+        public ViewHolderShort(ListLayoutBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
         }
         public TextView getTitleTxt(){
-            return title;
+            return binding.itemName;
+        }
+
+        public ListLayoutBinding getBinding(){
+            return binding;
         }
 
         public View getView(){
@@ -53,23 +59,26 @@ public class ListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     static class ViewHolderLong extends RecyclerView.ViewHolder{
 
-        TextView title, value;
+        ListLayout2Binding binding;
 
-        public ViewHolderLong(View itemView) {
-            super(itemView);
-            title =  itemView.findViewById(R.id.itemName);
-            value =  itemView.findViewById(R.id.itemValue);
+        public ViewHolderLong(ListLayout2Binding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
         }
+
         public TextView getTitleTxt(){
-            return title;
+            return binding.itemName;
         }
-
         public TextView getValueTxt(){
-            return value;
+            return binding.itemValue;
         }
 
         public View getView(){
             return itemView;
+        }
+
+        public ListLayout2Binding getBinding() {
+            return binding;
         }
 
     }
@@ -77,8 +86,8 @@ public class ListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     static class ViewHolderSpace extends RecyclerView.ViewHolder{
 
 
-        public ViewHolderSpace(View itemView) {
-            super(itemView);
+        public ViewHolderSpace(SpaceLayoutBinding binding) {
+            super(binding.getRoot());
 
         }
 
@@ -108,18 +117,16 @@ public class ListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         switch (viewType) {
-            case 0:
-                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_layout,parent,false);
-                return new ViewHolderShort(view);
             case 1:
-                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_layout2,parent,false);
-                return new ViewHolderLong(view);
+                ListLayout2Binding longItemBinding = ListLayout2Binding.inflate(LayoutInflater.from(parent.getContext()),parent,false);
+                return new ViewHolderLong(longItemBinding);
             case 2:
-                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.space_layout,parent,false);
-                return new ViewHolderSpace(view);
+                SpaceLayoutBinding spaceBinding = SpaceLayoutBinding.inflate(LayoutInflater.from(parent.getContext()),parent,false);
+                return new ViewHolderSpace(spaceBinding);
+            default:
+                ListLayoutBinding shortItemBinding = ListLayoutBinding.inflate(LayoutInflater.from(parent.getContext()),parent,false);
+                return new ViewHolderShort(shortItemBinding);
         }
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_layout,parent,false);
-        return new ViewHolderShort(view);
     }
 
     @Override
@@ -143,17 +150,17 @@ public class ListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             View view = currentHolder.getView();
 
             if (isEditMode){
-                view.findViewById(R.id.btn).setOnClickListener(v -> {
+                currentHolder.binding.btn.setOnClickListener(v -> {
                     activity.editItem(pos);
                 });
-                view.findViewById(R.id.btn).setOnLongClickListener(null);
-                view.findViewById(R.id.copyBtn).setVisibility(View.GONE);
+                currentHolder.binding.btn.setOnLongClickListener(null);
+                currentHolder.binding.copyBtn.setVisibility(View.GONE);
                 return;
             }
 
             if (selectedItem == position){
-                view.findViewById(R.id.copyBtn).setVisibility(View.VISIBLE);
-            }else view.findViewById(R.id.copyBtn).setVisibility(View.GONE);
+                currentHolder.binding.copyBtn.setVisibility(View.VISIBLE);
+            }else currentHolder.binding.copyBtn.setVisibility(View.GONE);
 
             if (highlightedItem == position){
                 functions.setAnimation(context,view,R.anim.button_prev,new OvershootInterpolator());
@@ -162,8 +169,8 @@ public class ListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
             String newPath = path + (path.equals("") ? "": "///" + (item.getId()!=-1?"{" + item.getId() + "}":"")) + item.getName();
 
-            view.findViewById(R.id.btn).setOnClickListener(view1 -> activity.open(JsonData.getPathFormat(newPath),newPath,item.getPosition()!=-1?item.getPosition():position));
-            view.findViewById(R.id.copyBtn).setOnClickListener(v -> {
+            currentHolder.binding.btn.setOnClickListener(view1 -> activity.open(JsonData.getPathFormat(newPath),newPath,item.getPosition()!=-1?item.getPosition():position));
+            currentHolder.binding.copyBtn.setOnClickListener(v -> {
                 ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
                 ClipData clipData = ClipData.newPlainText("Text",item.getName());
                 clipboard.setPrimaryClip(clipData);
@@ -171,7 +178,7 @@ public class ListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 selectedItem = -1;
                 notifyItemChanged(position);
             });
-            view.findViewById(R.id.btn).setOnLongClickListener(v -> {
+            currentHolder.binding.btn.setOnLongClickListener(v -> {
                 notifyItemChanged(selectedItem);
                 selectedItem = position;
                 notifyItemChanged(position);
@@ -196,15 +203,15 @@ public class ListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         if (isEditMode){
             setTextClickable(currentHolder.getTitleTxt(),false);
             setTextClickable(currentHolder.getValueTxt(),false);
-            view.findViewById(R.id.btn).setClickable(true);
-            view.findViewById(R.id.btn).setBackgroundResource(R.drawable.ripple_list2);
+            currentHolder.binding.btn.setClickable(true);
+            currentHolder.binding.btn.setBackgroundResource(R.drawable.ripple_list2);
 
-            view.findViewById(R.id.btn).setOnClickListener(v -> {
+            currentHolder.binding.btn.setOnClickListener(v -> {
                 activity.editItem(pos);
             });
         } else {
-            view.findViewById(R.id.btn).setOnClickListener(null);
-            view.findViewById(R.id.btn).setBackgroundResource(R.drawable.background);
+            currentHolder.binding.btn.setOnClickListener(null);
+            currentHolder.binding.btn.setBackgroundResource(R.drawable.background);
             setTextClickable(currentHolder.getTitleTxt(),true);
             setTextClickable(currentHolder.getValueTxt(),true);
         }

@@ -25,9 +25,9 @@ public class AndroidDragAndDrop {
     public AndroidDragAndDrop(MainActivity activity, DragAndDropCallback callback){
         this.activity = activity;
 
-        dropTarget = activity.findViewById(R.id.dropTarget);
-        dropTargetTxt = activity.findViewById(R.id.dropTargetText);
-        dropTargetBackground = activity.findViewById(R.id.dropTargetBackground);
+        dropTarget = activity.binding.dropTarget;
+        dropTargetTxt = activity.binding.dropTargetText;
+        dropTargetBackground = activity.binding.dropTargetBackground;
         this.callback = callback;
         setEvent();
     }

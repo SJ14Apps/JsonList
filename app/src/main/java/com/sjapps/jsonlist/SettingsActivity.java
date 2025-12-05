@@ -8,29 +8,26 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Spinner;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import com.google.android.material.materialswitch.MaterialSwitch;
 import com.sj14apps.jsonlist.core.AppState;
+import com.sjapps.jsonlist.databinding.ActivitySettingsBinding;
 
 public class SettingsActivity extends AppCompatActivity {
 
-    MaterialSwitch CheckForUpdateSw;
-    MaterialSwitch disableMIMEFilterSw;
-    MaterialSwitch syntaxHighlightingSw;
-    Spinner ThemeSpinner;
+    ActivitySettingsBinding binding;
     ArrayAdapter<CharSequence> Themes;
     AppState state;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_settings);
+        binding = ActivitySettingsBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
         initialize();
         setLayoutBounds();
@@ -38,11 +35,11 @@ public class SettingsActivity extends AppCompatActivity {
         LoadData();
 
         Animation animation = AnimationUtils.loadAnimation(this, R.anim.slide_from_bottom);
-        findViewById(R.id.mainSV).startAnimation(animation);
+        binding.mainSV.startAnimation(animation);
 
-        ThemeSpinner.setSelection(state.getTheme());
+        binding.themeSpinner.setSelection(state.getTheme());
 
-        ThemeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        binding.themeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @SuppressLint("WrongConstant")
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -68,21 +65,21 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
 
-        CheckForUpdateSw.setChecked(state.isAutoCheckForUpdate());
-        disableMIMEFilterSw.setChecked(state.isMIMEFilterDisabled());
-        syntaxHighlightingSw.setChecked(state.isSyntaxHighlighting());
+        binding.CheckForUpdateSwitch.setChecked(state.isAutoCheckForUpdate());
+        binding.MIMESwitch.setChecked(state.isMIMEFilterDisabled());
+        binding.sHighlightingSwitch.setChecked(state.isSyntaxHighlighting());
 
-        CheckForUpdateSw.setOnCheckedChangeListener((buttonView, isChecked) -> {
+        binding.CheckForUpdateSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             state.setAutoCheckForUpdate(isChecked);
             SaveData();
         });
 
-        disableMIMEFilterSw.setOnCheckedChangeListener((buttonView, isChecked) -> {
+        binding.MIMESwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             state.setMIMEFilterDisabled(isChecked);
             SaveData();
         });
 
-        syntaxHighlightingSw.setOnCheckedChangeListener((buttonView, isChecked) -> {
+        binding.sHighlightingSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             state.setSyntaxHighlighting(isChecked);
             SaveData();
         });
@@ -90,7 +87,7 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     private void setLayoutBounds() {
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.rootView), (v, windowInsets) -> {
+        ViewCompat.setOnApplyWindowInsetsListener(binding.rootView, (v, windowInsets) -> {
             Insets insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars());
             Insets insetsN = windowInsets.getInsets(WindowInsetsCompat.Type.displayCutout());
 
@@ -114,13 +111,10 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     private void initialize() {
-        CheckForUpdateSw = findViewById(R.id.CheckForUpdateSwitch);
-        disableMIMEFilterSw = findViewById(R.id.MIMESwitch);
-        syntaxHighlightingSw = findViewById(R.id.sHighlightingSwitch);
-        ThemeSpinner = findViewById(R.id.theme_spinner);
+
         Themes = ArrayAdapter.createFromResource(this, R.array.Themes, android.R.layout.simple_spinner_item);
         Themes.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        ThemeSpinner.setAdapter(Themes);
+        binding.themeSpinner.setAdapter(Themes);
 
     }
 

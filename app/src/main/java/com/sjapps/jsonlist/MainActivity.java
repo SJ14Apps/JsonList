@@ -20,6 +20,7 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -45,21 +46,13 @@ import android.view.animation.DecelerateInterpolator;
 import android.view.animation.OvershootInterpolator;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.webkit.WebView;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
-import com.google.android.material.floatingtoolbar.FloatingToolbarLayout;
-import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -80,6 +73,8 @@ import com.sj14apps.jsonlist.core.controllers.WebManager;
 import com.sj14apps.jsonlist.core.AppState;
 import com.sj14apps.jsonlist.core.JsonData;
 import com.sj14apps.jsonlist.core.ListItem;
+import com.sjapps.jsonlist.databinding.ActivityMainBinding;
+import com.sjapps.jsonlist.databinding.EditItemBinding;
 import com.sjapps.library.customdialog.BasicDialog;
 import com.sjapps.library.customdialog.CustomViewDialog;
 import com.sjapps.library.customdialog.DialogButtonEvents;
@@ -98,37 +93,17 @@ import java.util.Objects;
 public class MainActivity extends AppCompatActivity {
 
     final String TAG = "MainActivity";
-    ImageButton backBtn, menuBtn, splitViewBtn, filterBtn, searchBtn;
-    View editBtn;
-    ImageView fileImg;
-    Button openFileBtn;
-    Button openUrlBtn;
-    EditText urlSearchTxt,searchTxt;
-    LinearLayout urlLL;
-    LinearLayout searchLL;
-    LinearLayout messageLL;
-    TextView titleTxt, emptyListTxt;
-    RecyclerView list;
-    RecyclerView pathList;
-    RecyclerView searchList;
+
+    public ActivityMainBinding binding;
+
     public JsonData data = new JsonData();
-    public LinearLayout progressView;
-    ConstraintLayout mainLL;
-    LinearProgressIndicator progressBar;
     ListAdapter adapter;
     PathListAdapter pathAdapter;
     SearchListAdapter searchAdapter;
-    View menu, dim_bg, pathListView;
-    public WebView rawJsonWV;
-    public ViewGroup viewGroup;
     public AutoTransition autoTransition = new AutoTransition();
     public Handler handler = new Handler();
     public Thread readFileThread;
-    public RelativeLayout listRL;
-    public RelativeLayout rawJsonRL;
     public AppState state;
-    public View resizeSplitViewBtn;
-    FloatingToolbarLayout toolbar;
     int listPrevDx = 0;
     RawJsonView rawJsonView;
     FileManager fileManager;
@@ -142,8 +117,8 @@ public class MainActivity extends AppCompatActivity {
     boolean isEdited;
     public boolean isEditMode;
     boolean unsavedChanges;
-    ImageButton saveBtn;
-    public Guideline guideLine;
+
+    public Guideline guideline;
 
     ArrayList<String> filterList = new ArrayList<>();
 
@@ -162,7 +137,8 @@ public class MainActivity extends AppCompatActivity {
         if (!(Thread.getDefaultUncaughtExceptionHandler() instanceof CustomExceptionHandler))
             Thread.setDefaultUncaughtExceptionHandler(new CustomExceptionHandler(this));
 
-        setContentView(R.layout.activity_main);
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
         initialize();
         setLayoutBounds();
         setEvents();
@@ -184,50 +160,20 @@ public class MainActivity extends AppCompatActivity {
             showUrlSearchView();
         }
 
-        functions.setAnimation(this,fileImg,R.anim.scale_in_file_img, new DecelerateInterpolator());
-        functions.setAnimation(this,openFileBtn,R.anim.button_pop, new OvershootInterpolator());
+        functions.setAnimation(this,binding.fileImg,R.anim.scale_in_file_img, new DecelerateInterpolator());
+        functions.setAnimation(this,binding.openFileBtn,R.anim.button_pop, new OvershootInterpolator());
 
         autoTransition.setDuration(150);
     }
 
     private void initialize() {
         getOnBackPressedDispatcher().addCallback(this, backPressedCallback);
-        backBtn = findViewById(R.id.backBtn);
-        menuBtn = findViewById(R.id.menuBtn);
-        mainLL = findViewById(R.id.mainLL);
-        messageLL = findViewById(R.id.messageLL);
-        splitViewBtn = findViewById(R.id.splitViewBtn);
-        filterBtn = findViewById(R.id.filterBtn);
-        searchBtn = findViewById(R.id.searchBtn);
-        editBtn = findViewById(R.id.editBtn);
-        titleTxt = findViewById(R.id.titleTxt);
-        emptyListTxt = findViewById(R.id.emptyListTxt);
-        list = findViewById(R.id.list);
-        pathListView = findViewById(R.id.pathListBG);
-        pathList = findViewById(R.id.pathList);
-        searchList = findViewById(R.id.searchResultList);
-        listRL = findViewById(R.id.listRL);
-        openFileBtn = findViewById(R.id.openFileBtn);
-        openUrlBtn = findViewById(R.id.openUrlBtn);
-        urlSearchTxt = findViewById(R.id.urlSearch);
-        searchTxt = findViewById(R.id.searchTxt);
-        urlLL = findViewById(R.id.searchUrlView);
-        searchLL = findViewById(R.id.searchLL);
-        viewGroup = findViewById(R.id.content);
-        menu = findViewById(R.id.menu);
-        dim_bg = findViewById(R.id.dim_layout);
-        progressView = findViewById(R.id.loadingView);
-        progressBar = findViewById(R.id.progressBar);
-        fileImg = findViewById(R.id.fileImg);
-        dim_bg.bringToFront();
-        menu.bringToFront();
-        rawJsonRL = findViewById(R.id.rawJsonRL);
-        rawJsonWV = findViewById(R.id.rawJsonWV);
-        menuBtn.bringToFront();
-        resizeSplitViewBtn = findViewById(R.id.resizeSplitViewBtn);
-        toolbar = findViewById(R.id.floating_toolbar);
-        saveBtn = findViewById(R.id.saveBtn);
-        guideLine = findViewById(R.id.guideline);
+
+        guideline = binding.guidelineHorizontal;
+
+        binding.dimLayout.bringToFront();
+        binding.menu.getRoot().bringToFront();
+        binding.menuBtn.bringToFront();
 
         LinearLayoutManager pathLM = new LinearLayoutManager(this);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this){
@@ -263,9 +209,9 @@ public class MainActivity extends AppCompatActivity {
 
         rawJsonView.updateRawJson("");
 
-        list.setLayoutManager(layoutManager);
-        pathList.setLayoutManager(pathLM);
-        searchList.setLayoutManager(new LinearLayoutManager(this));
+        binding.list.setLayoutManager(layoutManager);
+        binding.pathList.setLayoutManager(pathLM);
+        binding.searchResultList.setLayoutManager(new LinearLayoutManager(this));
 
         fileManager = new AndroidFileManager(this,handler);
         jsonLoader = new AndroidJsonLoader(this);
@@ -275,7 +221,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setLayoutBounds() {
-        ViewCompat.setOnApplyWindowInsetsListener(viewGroup, (v, windowInsets) -> {
+        ViewCompat.setOnApplyWindowInsetsListener(binding.content, (v, windowInsets) -> {
             Insets insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars());
             Insets insetsN = windowInsets.getInsets(WindowInsetsCompat.Type.displayCutout());
 
@@ -288,7 +234,7 @@ public class MainActivity extends AppCompatActivity {
             v.setLayoutParams(layoutParams);
 
             Insets imeInsets = windowInsets.getInsets(WindowInsetsCompat.Type.ime());
-            searchLL.setPadding(
+            binding.searchLL.setPadding(
                     v.getPaddingLeft(),
                     v.getPaddingTop(),
                     v.getPaddingRight(),
@@ -299,26 +245,27 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private void setEvents(){
-        menuBtn.setOnClickListener(view -> open_closeMenu());
+        binding.menuBtn.setOnClickListener(view -> open_closeMenu());
 
-        backBtn.setOnClickListener(view -> {
-            if(!data.isEmptyPath() || urlLL.getVisibility() == VISIBLE || searchLL.getVisibility() == VISIBLE || (adapter != null && adapter.isEditMode())) getOnBackPressedDispatcher().onBackPressed();
+        binding.backBtn.setOnClickListener(view -> {
+            if(canCallBackDispatcher()) getOnBackPressedDispatcher().onBackPressed();
         });
-        openFileBtn.setOnClickListener(view -> fileManager.importFromFile());
-        openUrlBtn.setOnClickListener(view -> {
+        binding.openFileBtn.setOnClickListener(view -> fileManager.importFromFile());
+        binding.openUrlBtn.setOnClickListener(view -> {
             showUrlSearchView();
         });
 
-        titleTxt.setOnClickListener(v -> {
+        binding.titleTxt.setOnClickListener(v -> {
             if (!data.isEmptyPath())
                 showHidePathList();
         });
 
-        pathListView.setOnClickListener(v -> showHidePathList());
+        binding.pathListBG.setOnClickListener(v -> showHidePathList());
 
         //TODO Web
-        urlSearchTxt.setOnEditorActionListener((v, actionId, event) -> {
+        binding.urlSearch.setOnEditorActionListener((v, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_DONE ||
                     actionId == EditorInfo.IME_ACTION_SEARCH ||
                     event != null &&
@@ -332,7 +279,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-        ChipGroup searchChipGroup = findViewById(R.id.searchChipGroup);
+        ChipGroup searchChipGroup = binding.searchChipGroup;
         searchChipGroup.setOnCheckedStateChangeListener((group, checkedIds) -> {
             if (!checkedIds.isEmpty()){
                 boolean chip1 = ((Chip) group.getChildAt(0)).isChecked();
@@ -347,11 +294,11 @@ public class MainActivity extends AppCompatActivity {
 
             }else data.searchMode = 0;
 
-            if (searchLL.getVisibility() == VISIBLE)
-                search(searchTxt.getText().toString());
+            if (binding.searchLL.getVisibility() == VISIBLE)
+                search(binding.searchTxt.getText().toString());
         });
 
-        searchTxt.addTextChangedListener(new TextWatcher() {
+        binding.searchTxt.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
@@ -359,7 +306,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (searchLL.getVisibility() == VISIBLE)
+                if (binding.searchLL.getVisibility() == VISIBLE)
                     search(s.toString());
             }
 
@@ -369,7 +316,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        searchTxt.setOnEditorActionListener((v, actionId, event) -> {
+        binding.searchTxt.setOnEditorActionListener((v, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_DONE ||
                     actionId == EditorInfo.IME_ACTION_SEARCH ||
                     event != null &&
@@ -377,38 +324,40 @@ public class MainActivity extends AppCompatActivity {
                             event.getKeyCode() == KeyEvent.KEYCODE_ENTER){
 
                 InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(searchTxt.getWindowToken(), 0);
+                imm.hideSoftInputFromWindow(binding.searchTxt.getWindowToken(), 0);
                 return true;
             }
             return false;
         });
 
-        menu.findViewById(R.id.openFileBtn2).setOnClickListener(view -> {
+        binding.menu.openFileBtn2.setOnClickListener(view -> {
             fileManager.importFromFile();
             open_closeMenu();
         });
-        menu.findViewById(R.id.searchUrlBtn).setOnClickListener(view -> {
+        binding.menu.searchUrlBtn.setOnClickListener(view -> {
             open_closeMenu();
             showUrlSearchView();
         });
-        menu.findViewById(R.id.settingsBtn).setOnClickListener(view -> {
+        binding.menu.settingsBtn.setOnClickListener(view -> {
             OpenSettings();
             open_closeMenu();
         });
-        menu.findViewById(R.id.aboutBtn).setOnClickListener(view -> {
+        binding.menu.aboutBtn.setOnClickListener(view -> {
             OpenAbout();
             open_closeMenu();
         });
-        menu.findViewById(R.id.logBtn).setOnClickListener(view -> {
+        binding.menu.logBtn.setOnClickListener(view -> {
             OpenLogPage();
             open_closeMenu();
         });
-        dim_bg.setOnClickListener(view -> open_closeMenu());
-        splitViewBtn.setOnClickListener(view -> rawJsonView.toggleSplitView());
-        filterBtn.setOnClickListener(view -> filter());
-        searchBtn.setOnClickListener(view -> showSearchView());
-        editBtn.setOnClickListener(view -> toggleEdit());
-        saveBtn.setOnClickListener(view -> saveChanges());
+        binding.dimLayout.setOnClickListener(view -> open_closeMenu());
+        binding.splitViewBtn.setOnClickListener(view -> rawJsonView.toggleSplitView());
+        binding.filterBtn.setOnClickListener(view -> filter());
+        binding.searchBtn.setOnClickListener(view -> showSearchView());
+        binding.editBtn.setOnClickListener(view -> toggleEdit());
+        binding.saveBtn.setOnClickListener(view -> saveChanges());
+
+        FrameLayout resizeSplitViewBtn = binding.resizeSplitViewBtn;
 
         resizeSplitViewBtn.setOnTouchListener(new View.OnTouchListener() {
 
@@ -422,25 +371,25 @@ public class MainActivity extends AppCompatActivity {
                         return true;
 
                     case MotionEvent.ACTION_MOVE:
-                        ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) guideLine.getLayoutParams();
+                        ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) guideline.getLayoutParams();
                         if (isVertical){
-                            params.guidePercent = (event.getRawY() - mainLL.getY()) / viewGroup.getHeight();
+                            params.guidePercent = (event.getRawY() - binding.mainLL.getY()) / binding.content.getHeight();
                         }else {
-                            params.guidePercent = (event.getRawX() - mainLL.getX()) / viewGroup.getWidth();
+                            params.guidePercent = (event.getRawX() - binding.mainLL.getX()) / binding.content.getWidth();
                         }
                         if (params.guidePercent < 0.2f){
                             params.guidePercent = 0.03f;
-                            if (listRL.getVisibility() == VISIBLE)
+                            if (binding.listRL.getVisibility() == VISIBLE)
                                 resizeSplitViewBtn.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK);
-                            listRL.setVisibility(GONE);
+                            binding.listRL.setVisibility(GONE);
                         }else {
-                            if (listRL.getVisibility() == GONE)
+                            if (binding.listRL.getVisibility() == GONE)
                                 resizeSplitViewBtn.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
-                            listRL.setVisibility(VISIBLE);
+                            binding.listRL.setVisibility(VISIBLE);
                         }
                         if (params.guidePercent > 0.8f)
                             params.guidePercent = 0.8f;
-                        guideLine.setLayoutParams(params);
+                        guideline.setLayoutParams(params);
                         return true;
 
                     case MotionEvent.ACTION_UP:
@@ -480,13 +429,13 @@ public class MainActivity extends AppCompatActivity {
         if (isEditMode){
             showBackBtn();
             hideToolbar();
-            menuBtn.setVisibility(INVISIBLE);
-            splitViewBtn.setVisibility(INVISIBLE);
-            saveBtn.setVisibility(INVISIBLE);
+            binding.menuBtn.setVisibility(INVISIBLE);
+            binding.splitViewBtn.setVisibility(INVISIBLE);
+            binding.saveBtn.setVisibility(INVISIBLE);
         }
         else {
-            menuBtn.setVisibility(VISIBLE);
-            splitViewBtn.setVisibility(VISIBLE);
+            binding.menuBtn.setVisibility(VISIBLE);
+            binding.splitViewBtn.setVisibility(VISIBLE);
             hideBackBtnIfNotNeeded();
 
             if (isEdited){
@@ -494,17 +443,17 @@ public class MainActivity extends AppCompatActivity {
                 isEdited = false;
                 rawJsonView.isRawJsonLoaded = false;
                 unsavedChanges = true;
-                saveBtn.setVisibility(VISIBLE);
+                binding.saveBtn.setVisibility(VISIBLE);
                 if (rawJsonView.showJson){
                     rawJsonView.ShowJSON();
                 }
             }else if (unsavedChanges)
-                saveBtn.setVisibility(VISIBLE);
+                binding.saveBtn.setVisibility(VISIBLE);
         }
 
         adapter.setEditMode(isEditMode);
         adapter.notifyItemRangeChanged(0,adapter.getItemCount());
-        messageLL.setVisibility(isEditMode ? VISIBLE: GONE);
+        binding.messageLL.setVisibility(isEditMode ? VISIBLE: GONE);
     }
 
     @Override
@@ -522,7 +471,7 @@ public class MainActivity extends AppCompatActivity {
     OnBackPressedCallback backPressedCallback = new OnBackPressedCallback(true) {
         @Override
         public void handleOnBackPressed() {
-            if (pathListView.getVisibility() == VISIBLE){
+            if (binding.pathListBG.getVisibility() == VISIBLE){
                 showHidePathList();
                 return;
             }
@@ -537,16 +486,16 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
 
-            if (urlLL.getVisibility() == VISIBLE){
+            if (binding.searchUrlView.getVisibility() == VISIBLE){
                 hideUrlSearchView();
                 return;
             }
-            if (searchLL.getVisibility() == VISIBLE){
+            if (binding.searchLL.getVisibility() == VISIBLE){
                 hideSearchView();
                 return;
             }
 
-            if (listRL.getVisibility() == GONE){
+            if (binding.listRL.getVisibility() == GONE){
                 ShowList();
                 return;
             }
@@ -596,8 +545,8 @@ public class MainActivity extends AppCompatActivity {
                         .show();
                 return;
             }
-            TransitionManager.endTransitions(viewGroup);
-            TransitionManager.beginDelayedTransition(viewGroup, autoTransition);
+            TransitionManager.endTransitions(binding.content);
+            TransitionManager.beginDelayedTransition(binding.content, autoTransition);
             data.goBack();
             open(JsonData.getPathFormat(data.getPath()), data.getPath(),-1);
         }
@@ -624,7 +573,7 @@ public class MainActivity extends AppCompatActivity {
     void checkCrashLogs() {
 
         AppState state = FileSystem.loadStateData(this);
-        TextView logBtn = menu.findViewById(R.id.logBtn);
+        TextView logBtn = binding.menu.logBtn;
         if (!state.hasCrashLogs()) {
             logBtn.setVisibility(GONE);
             return;
@@ -637,13 +586,13 @@ public class MainActivity extends AppCompatActivity {
             getTheme().resolveAttribute(R.attr.colorOnError, typedValue, true);
             logBtn.setTextColor(typedValue.data);
             logBtn.setBackgroundResource(R.drawable.ripple_red);
-            menuBtn.setImageResource(R.drawable.menu_with_dot);
+            binding.menuBtn.setImageResource(R.drawable.menu_with_dot);
             return;
         }
         getTheme().resolveAttribute(R.attr.colorOnSurfaceVariant, typedValue, true);
         logBtn.setTextColor(typedValue.data);
         logBtn.setBackgroundResource(R.drawable.ripple_list2);
-        menuBtn.setImageResource(R.drawable.ic_menu);
+        binding.menuBtn.setImageResource(R.drawable.ic_menu);
     }
 
     private void OpenSettings() {
@@ -662,11 +611,11 @@ public class MainActivity extends AppCompatActivity {
         if (isEditMode)
             return;
 
-        toolbar.animate().cancel();
+        binding.floatingToolbar.animate().cancel();
 
         isTopMenuVisible = true;
-        toolbar.setVisibility(VISIBLE);
-        toolbar.animate()
+        binding.floatingToolbar.setVisibility(VISIBLE);
+        binding.floatingToolbar.animate()
                 .translationY(0)
                 .scaleX(1)
                 .scaleY(1)
@@ -678,29 +627,29 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void hideToolbar() {
-        toolbar.animate().cancel();
+        binding.floatingToolbar.animate().cancel();
 
         isTopMenuVisible = false;
-        toolbar.animate()
-                .translationY(toolbar.getHeight()+50)
+        binding.floatingToolbar.animate()
+                .translationY(binding.floatingToolbar.getHeight()+50)
                 .setDuration(300)
                 .scaleX(.5f)
                 .scaleY(.5f)
                 .alpha(0)
-                .withEndAction(()-> toolbar.setVisibility(GONE))
+                .withEndAction(()-> binding.floatingToolbar.setVisibility(GONE))
                 .start();
     }
 
     private void open_closeMenu() {
         if (!isMenuOpen) {
-            dim_bg.setVisibility(VISIBLE);
-            menu.setVisibility(VISIBLE);
-            menuBtn.setImageResource(R.drawable.ic_close);
+            binding.dimLayout.setVisibility(VISIBLE);
+            binding.menu.getRoot().setVisibility(VISIBLE);
+            binding.menuBtn.setImageResource(R.drawable.ic_close);
             isMenuOpen = true;
         } else {
-            dim_bg.setVisibility(INVISIBLE);
-            menu.setVisibility(GONE);
-            menuBtn.setImageResource(R.drawable.ic_menu);
+            binding.dimLayout.setVisibility(INVISIBLE);
+            binding.menu.getRoot().setVisibility(GONE);
+            binding.menuBtn.setImageResource(R.drawable.ic_menu);
             isMenuOpen = false;
         }
     }
@@ -711,98 +660,98 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        if (searchLL.getVisibility() == VISIBLE){
+        if (binding.searchLL.getVisibility() == VISIBLE){
             hideSearchView();
         }
 
 
-        TransitionManager.beginDelayedTransition(viewGroup, autoTransition);
-        mainLL.setVisibility(GONE);
-        urlLL.setVisibility(VISIBLE);
+        TransitionManager.beginDelayedTransition(binding.content, autoTransition);
+        binding.mainLL.setVisibility(GONE);
+        binding.searchUrlView.setVisibility(VISIBLE);
 
-        if (backBtn.getVisibility() == GONE)
-            backBtn.setVisibility(VISIBLE);
+        if (binding.backBtn.getVisibility() == GONE)
+            binding.backBtn.setVisibility(VISIBLE);
 
-        urlSearchTxt.requestFocus();
+        binding.urlSearch.requestFocus();
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.showSoftInput(urlSearchTxt, InputMethodManager.SHOW_IMPLICIT);
+        imm.showSoftInput(binding.urlSearch, InputMethodManager.SHOW_IMPLICIT);
     }
 
     public void hideUrlSearchView() {
-        urlLL.setVisibility(GONE);
-        TransitionManager.beginDelayedTransition(viewGroup, autoTransition);
-        mainLL.setVisibility(VISIBLE);
-        urlSearchTxt.setText("");
+        binding.searchUrlView.setVisibility(GONE);
+        TransitionManager.beginDelayedTransition(binding.content, autoTransition);
+        binding.mainLL.setVisibility(VISIBLE);
+        binding.urlSearch.setText("");
 
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         if (imm.isActive())
-            imm.hideSoftInputFromWindow(urlSearchTxt.getWindowToken(), 0);
+            imm.hideSoftInputFromWindow(binding.urlSearch.getWindowToken(), 0);
 
         if (data.isEmptyPath()) {
-            backBtn.setVisibility(GONE);
+            binding.backBtn.setVisibility(GONE);
         }
 
     }
 
     private void showSearchView() {
-        TransitionManager.beginDelayedTransition(viewGroup, autoTransition);
-        mainLL.setVisibility(GONE);
-        searchLL.setVisibility(VISIBLE);
+        TransitionManager.beginDelayedTransition(binding.content, autoTransition);
+        binding.mainLL.setVisibility(GONE);
+        binding.searchLL.setVisibility(VISIBLE);
 
-        if (backBtn.getVisibility() == GONE)
-            backBtn.setVisibility(VISIBLE);
+        if (binding.backBtn.getVisibility() == GONE)
+            binding.backBtn.setVisibility(VISIBLE);
 
-        searchTxt.requestFocus();
+        binding.searchTxt.requestFocus();
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.showSoftInput(searchTxt, InputMethodManager.SHOW_IMPLICIT);
+        imm.showSoftInput(binding.searchTxt, InputMethodManager.SHOW_IMPLICIT);
 
         searchAdapter = new SearchListAdapter(this,new ArrayList<>());
 
-        searchList.setAdapter(searchAdapter);
+        binding.searchResultList.setAdapter(searchAdapter);
 
     }
 
     public void hideSearchView() {
-        searchLL.setVisibility(GONE);
-        TransitionManager.beginDelayedTransition(viewGroup, autoTransition);
-        mainLL.setVisibility(VISIBLE);
-        searchTxt.setText("");
+        binding.searchLL.setVisibility(GONE);
+        TransitionManager.beginDelayedTransition(binding.content, autoTransition);
+        binding.mainLL.setVisibility(VISIBLE);
+        binding.searchTxt.setText("");
 
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         if (imm.isActive())
-            imm.hideSoftInputFromWindow(searchTxt.getWindowToken(), 0);
+            imm.hideSoftInputFromWindow(binding.searchTxt.getWindowToken(), 0);
 
         if (data.isEmptyPath()) {
-            backBtn.setVisibility(GONE);
+            binding.backBtn.setVisibility(GONE);
         }
 
     }
 
     public void open(String Title, String path, int previousPosition) {
-        TransitionManager.endTransitions(viewGroup);
-        TransitionManager.beginDelayedTransition(viewGroup, autoTransition);
+        TransitionManager.endTransitions(binding.content);
+        TransitionManager.beginDelayedTransition(binding.content, autoTransition);
 
         if (isMenuOpen)
             open_closeMenu();
 
-        if (emptyListTxt.getVisibility() == VISIBLE)
-            emptyListTxt.setVisibility(GONE);
+        if (binding.emptyListTxt.getVisibility() == VISIBLE)
+            binding.emptyListTxt.setVisibility(GONE);
 
 
 
         pathAdapter = new PathListAdapter(this,path);
-        pathList.setAdapter(pathAdapter);
+        binding.pathList.setAdapter(pathAdapter);
         data.setPath(path);
-        titleTxt.setText(Title);
+        binding.titleTxt.setText(Title);
         ArrayList<ListItem> arrayList = getListFromPath(path,data.getRootList());
         data.setCurrentList(arrayList);
         updateFilterList(arrayList);
         adapter = new ListAdapter(arrayList, this, path);
-        list.setAdapter(adapter);
+        binding.list.setAdapter(adapter);
 
         if (previousPosition == -1) {
             handler.postDelayed(() -> {
-                list.smoothScrollToPosition(data.getPreviousPos()+2);
+                binding.list.smoothScrollToPosition(data.getPreviousPos()+2);
                 adapter.setHighlightItem(data.getPreviousPos());
             }, 500);
             handler.postDelayed(() -> {
@@ -812,18 +761,18 @@ public class MainActivity extends AppCompatActivity {
         else data.addPreviousPos(previousPosition);
 
         if (arrayList.isEmpty()) {
-            emptyListTxt.setVisibility(VISIBLE);
+            binding.emptyListTxt.setVisibility(VISIBLE);
         }
         System.out.println("path = " + path);
         if (!path.isEmpty()) {
-            backBtn.setVisibility(VISIBLE);
-        } else backBtn.setVisibility(GONE);
+            binding.backBtn.setVisibility(VISIBLE);
+        } else binding.backBtn.setVisibility(GONE);
 
     }
 
     public void highlightItem(int id){
         handler.postDelayed(() -> {
-            list.smoothScrollToPosition(id+2);
+            binding.list.smoothScrollToPosition(id+2);
             adapter.setHighlightItem(id);
         }, 500);
         handler.postDelayed(() -> {
@@ -832,7 +781,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void goBack(int n){
-        if (pathListView.getVisibility() == VISIBLE)
+        if (binding.pathListBG.getVisibility() == VISIBLE)
             showHidePathList();
         for (int i = 0; i<n; i++)
             data.goBack();
@@ -840,15 +789,22 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    private boolean canCallBackDispatcher(){
+        return !data.isEmptyPath() ||
+                binding.searchUrlView.getVisibility() == VISIBLE ||
+                binding.searchLL.getVisibility() == VISIBLE ||
+                (adapter != null && adapter.isEditMode());
+    }
+
     private void showBackBtn() {
-        if (backBtn.getVisibility() == VISIBLE)
+        if (binding.backBtn.getVisibility() == VISIBLE)
             return;
-        backBtn.setVisibility(VISIBLE);
+        binding.backBtn.setVisibility(VISIBLE);
     }
 
     private void hideBackBtnIfNotNeeded() {
         if (data.isEmptyPath())
-            backBtn.setVisibility(GONE);
+            binding.backBtn.setVisibility(GONE);
     }
 
     private void filter() {
@@ -880,7 +836,7 @@ public class MainActivity extends AppCompatActivity {
         }else newList = data.getCurrentList();
 
         adapter = new ListAdapter(newList, this, data.getPath());
-        list.setAdapter(adapter);
+        binding.list.setAdapter(adapter);
     }
 
     private void updateFilterList(ArrayList<ListItem> items) {
@@ -901,21 +857,21 @@ public class MainActivity extends AppCompatActivity {
         if (isEditMode)
             return;
 
-        if (pathListView.getVisibility() == VISIBLE) {
-            pathListView.setVisibility(GONE);
+        if (binding.pathListBG.getVisibility() == VISIBLE) {
+            binding.pathListBG.setVisibility(GONE);
             return;
         }
 
-        pathListView.setVisibility(VISIBLE);
+        binding.pathListBG.setVisibility(VISIBLE);
     }
 
     public void ShowList() {
-        TransitionManager.endTransitions(viewGroup);
-        TransitionManager.beginDelayedTransition(viewGroup, autoTransition);
+        TransitionManager.endTransitions(binding.content);
+        TransitionManager.beginDelayedTransition(binding.content, autoTransition);
 
-        resizeSplitViewBtn.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
-        listRL.setVisibility(VISIBLE);
-        guideLine.setGuidelinePercent(.5f);
+        binding.resizeSplitViewBtn.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
+        binding.listRL.setVisibility(VISIBLE);
+        guideline.setGuidelinePercent(.5f);
     }
 
     private void updateOrientation(){
@@ -923,33 +879,26 @@ public class MainActivity extends AppCompatActivity {
         int initWidth = functions.dpToPixels(this,100);
         int initHeight = functions.dpToPixels(this,7);
 
-        ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) resizeSplitViewBtn.getLayoutParams();
-        FrameLayout.LayoutParams paramsLine = (FrameLayout.LayoutParams) findViewById(R.id.resizeSplitViewBtnLine).getLayoutParams();
+        ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) binding.resizeSplitViewBtn.getLayoutParams();
+        FrameLayout.LayoutParams paramsLine = (FrameLayout.LayoutParams) binding.resizeSplitViewBtnLine.getLayoutParams();
 
-        mainLL.removeView(guideLine);
-        guideLine = new Guideline(this);
-        guideLine.setId(R.id.guideline);
 
-        ConstraintLayout.LayoutParams paramsGuideLine =
-                new ConstraintLayout.LayoutParams(
-                        ConstraintLayout.LayoutParams.WRAP_CONTENT,
-                        ConstraintLayout.LayoutParams.WRAP_CONTENT);
-
-        if (rawJsonView.showJson)
-            paramsGuideLine.guidePercent = 0.5f;
-        else paramsGuideLine.guidePercent = 1;
-
-        ConstraintLayout constraintLayout = findViewById(R.id.mainLL);
         ConstraintSet constraintSet = new ConstraintSet();
-        constraintSet.clone(constraintLayout);
+        constraintSet.clone(binding.mainLL);
+
+        float percent = rawJsonView.showJson ? 0.5f : 1f;
 
         constraintSet.clear(R.id.resizeSplitViewBtn);
         constraintSet.clear(R.id.listRL);
         constraintSet.clear(R.id.rawJsonRL);
 
         if (!isVertical){
-            paramsGuideLine.orientation = ConstraintLayout.LayoutParams.VERTICAL;
-            mainLL.addView(guideLine,1,paramsGuideLine);
+            guideline = binding.guidelineVertical;
+
+            constraintSet.setGuidelinePercent(binding.guidelineVertical.getId(),percent);
+
+            binding.guidelineVertical.setVisibility(VISIBLE);
+            binding.guidelineHorizontal.setVisibility(GONE);
 
             paramsLine.width = initHeight;
             paramsLine.height = initWidth;
@@ -958,32 +907,34 @@ public class MainActivity extends AppCompatActivity {
             params.topMargin = 0;
             params.topToTop = ConstraintLayout.LayoutParams.PARENT_ID;
             params.bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID;
-            params.startToStart = rawJsonRL.getId();
+            params.startToStart = binding.rawJsonRL.getId();
             params.endToEnd = ConstraintLayout.LayoutParams.UNSET;
 
             constraintSet.connect(R.id.listRL,ConstraintSet.START,ConstraintSet.PARENT_ID,ConstraintSet.START);
-            constraintSet.connect(R.id.listRL,ConstraintSet.END,R.id.guideline,ConstraintSet.START);
+            constraintSet.connect(R.id.listRL,ConstraintSet.END,guideline.getId(),ConstraintSet.START);
             constraintSet.connect(R.id.listRL,ConstraintSet.TOP,ConstraintSet.PARENT_ID,ConstraintSet.TOP);
             constraintSet.connect(R.id.listRL,ConstraintSet.BOTTOM,ConstraintSet.PARENT_ID,ConstraintSet.BOTTOM);
 
-            constraintSet.connect(R.id.rawJsonRL,ConstraintSet.START,R.id.guideline,ConstraintSet.START);
+            constraintSet.connect(R.id.rawJsonRL,ConstraintSet.START,guideline.getId(),ConstraintSet.START);
             constraintSet.connect(R.id.rawJsonRL,ConstraintSet.END,ConstraintSet.PARENT_ID,ConstraintSet.END);
             constraintSet.connect(R.id.rawJsonRL,ConstraintSet.TOP,ConstraintSet.PARENT_ID,ConstraintSet.TOP);
             constraintSet.connect(R.id.rawJsonRL,ConstraintSet.BOTTOM,ConstraintSet.PARENT_ID,ConstraintSet.BOTTOM);
 
-            constraintSet.applyTo(constraintLayout);
+            constraintSet.applyTo(binding.mainLL);
             return;
         }
+        guideline = binding.guidelineHorizontal;
 
-        paramsGuideLine.orientation = ConstraintLayout.LayoutParams.HORIZONTAL;
-        mainLL.addView(guideLine,paramsGuideLine);
+        constraintSet.setGuidelinePercent(binding.guidelineHorizontal.getId(),percent);
+        binding.guidelineHorizontal.setVisibility(VISIBLE);
+        binding.guidelineVertical.setVisibility(GONE);
 
         paramsLine.width = initWidth;
         paramsLine.height = initHeight;
 
         params.leftMargin = 0;
         params.topMargin = functions.dpToPixels(this,-15);
-        params.topToTop = rawJsonRL.getId();
+        params.topToTop = binding.rawJsonRL.getId();
         params.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
         params.startToStart = ConstraintLayout.LayoutParams.PARENT_ID;
         params.endToEnd = ConstraintLayout.LayoutParams.PARENT_ID;
@@ -991,14 +942,15 @@ public class MainActivity extends AppCompatActivity {
         constraintSet.connect(R.id.listRL,ConstraintSet.START,ConstraintSet.PARENT_ID,ConstraintSet.START);
         constraintSet.connect(R.id.listRL,ConstraintSet.END,ConstraintSet.PARENT_ID,ConstraintSet.END);
         constraintSet.connect(R.id.listRL,ConstraintSet.TOP,ConstraintSet.PARENT_ID,ConstraintSet.TOP);
-        constraintSet.connect(R.id.listRL,ConstraintSet.BOTTOM,R.id.guideline,ConstraintSet.BOTTOM);
+        constraintSet.connect(R.id.listRL,ConstraintSet.BOTTOM,guideline.getId(),ConstraintSet.BOTTOM);
 
         constraintSet.connect(R.id.rawJsonRL,ConstraintSet.START,ConstraintSet.PARENT_ID,ConstraintSet.START);
         constraintSet.connect(R.id.rawJsonRL,ConstraintSet.END,ConstraintSet.PARENT_ID,ConstraintSet.END);
-        constraintSet.connect(R.id.rawJsonRL,ConstraintSet.TOP,R.id.guideline,ConstraintSet.TOP);
+        constraintSet.connect(R.id.rawJsonRL,ConstraintSet.TOP,guideline.getId(),ConstraintSet.TOP);
         constraintSet.connect(R.id.rawJsonRL,ConstraintSet.BOTTOM,ConstraintSet.PARENT_ID,ConstraintSet.BOTTOM);
 
-        constraintSet.applyTo(constraintLayout);
+        constraintSet.applyTo(binding.mainLL);
+
     }
 
     void ReadFile(Uri uri){
@@ -1055,9 +1007,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void SearchUrl() {
-        webManager.getFromUrl(urlSearchTxt.getText().toString(),webCallback);
+        webManager.getFromUrl(binding.urlSearch.getText().toString(),webCallback);
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(urlSearchTxt.getWindowToken(), 0);
+        imm.hideSoftInputFromWindow(binding.urlSearch.getWindowToken(), 0);
     }
 
     public void loadingStarted(){
@@ -1066,14 +1018,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void loadingStarted(String txt){
-        TextView text =  progressView.findViewById(R.id.loadingTxt);
-        progressBar.setIndeterminate(true);
+        TextView text =  binding.progressTxt;
+        binding.progressBar.setIndeterminate(true);
         text.setText(txt);
         handler.postDelayed(() -> {
-            if (progressView.getVisibility() != VISIBLE) {
-                functions.setAnimation(this, progressView, R.anim.scale_in);
+            if (binding.progressView.getVisibility() != VISIBLE) {
+                functions.setAnimation(this, binding.progressView, R.anim.scale_in);
                 text.setVisibility(VISIBLE);
-                progressView.setVisibility(VISIBLE);
+                binding.progressView.setVisibility(VISIBLE);
             }
         },300);
 
@@ -1083,23 +1035,23 @@ public class MainActivity extends AppCompatActivity {
 
         if (!isFinished){
             handler.postDelayed(()-> {
-                functions.setAnimation(this, progressView,R.anim.scale_out);
-                progressView.setVisibility(INVISIBLE);
+                functions.setAnimation(this, binding.progressView,R.anim.scale_out);
+                binding.progressView.setVisibility(INVISIBLE);
             },300);
             return;
         }
 
-        progressBar.setIndeterminate(false);
-        progressBar.setProgressCompat(100,true);
+        binding.progressBar.setIndeterminate(false);
+        binding.progressBar.setProgressCompat(100,true);
 
-        TextView text =  progressView.findViewById(R.id.loadingTxt);
+        TextView text =  binding.progressTxt;
         handler.postDelayed(() -> text.setText( R.string.finished),500);
         handler.postDelayed(() -> {
         },700);
         handler.postDelayed(() -> text.setVisibility(INVISIBLE),900);
         handler.postDelayed(() -> {
-            functions.setAnimation(this, progressView,R.anim.scale_out);
-            progressView.setVisibility(INVISIBLE);
+            functions.setAnimation(this, binding.progressView,R.anim.scale_out);
+            binding.progressView.setVisibility(INVISIBLE);
         },1000);
     }
 
@@ -1125,7 +1077,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onProgressUpdate(int progress) {
             handler.post(()->{
-                progressBar.setProgressCompat(progress,true);
+                binding.progressBar.setProgressCompat(progress,true);
             });
         }
     };
@@ -1135,7 +1087,7 @@ public class MainActivity extends AppCompatActivity {
         public void onFileWriteSuccess() {
             unsavedChanges = false;
             loadingFinished(true);
-            saveBtn.setVisibility(GONE);
+            binding.saveBtn.setVisibility(GONE);
         }
 
         @Override
@@ -1146,7 +1098,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onProgressUpdate(int progress) {
-            progressBar.setProgressCompat(progress,true);
+            binding.progressBar.setProgressCompat(progress,true);
         }
     };
 
@@ -1154,7 +1106,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void start() {
             loadingStarted(getString(R.string.loading_json));
-            emptyListTxt.setVisibility(GONE);
+            binding.emptyListTxt.setVisibility(GONE);
         }
 
         @Override
@@ -1170,31 +1122,31 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void success() {
             handler.post(() -> {
-                TransitionManager.beginDelayedTransition(viewGroup, autoTransition);
+                TransitionManager.beginDelayedTransition(binding.content, autoTransition);
 
-                if (urlLL.getVisibility() == VISIBLE)
+                if (binding.searchUrlView.getVisibility() == VISIBLE)
                     hideUrlSearchView();
 
-                if (searchLL.getVisibility() == VISIBLE)
+                if (binding.searchLL.getVisibility() == VISIBLE)
                     hideSearchView();
 
                 data.setCurrentList(data.getRootList());
                 updateFilterList(data.getRootList());
                 adapter = new ListAdapter(data.getRootList(), MainActivity.this, "");
                 pathAdapter = new PathListAdapter(MainActivity.this,data.getPath());
-                list.setAdapter(adapter);
-                pathList.setAdapter(pathAdapter);
-                fileImg.clearAnimation();
-                openFileBtn.clearAnimation();
-                fileImg.setVisibility(GONE);
-                openFileBtn.setVisibility(GONE);
-                openUrlBtn.setVisibility(GONE);
-                functions.setAnimation(MainActivity.this,list,R.anim.scale_in2,new DecelerateInterpolator());
-                list.setVisibility(VISIBLE);
-                backBtn.setVisibility(GONE);
-                saveBtn.setVisibility(GONE);
+                binding.list.setAdapter(adapter);
+                binding.pathList.setAdapter(pathAdapter);
+                binding.fileImg.clearAnimation();
+                binding.openFileBtn.clearAnimation();
+                binding.fileImg.setVisibility(GONE);
+                binding.openFileBtn.setVisibility(GONE);
+                binding.openUrlBtn.setVisibility(GONE);
+                functions.setAnimation(MainActivity.this,binding.list,R.anim.scale_in2,new DecelerateInterpolator());
+                binding.list.setVisibility(VISIBLE);
+                binding.backBtn.setVisibility(GONE);
+                binding.saveBtn.setVisibility(GONE);
                 unsavedChanges = false;
-                titleTxt.setText("");
+                binding.titleTxt.setText("");
                 data.clearPath();
 
                 if (!isTopMenuVisible)
@@ -1298,7 +1250,7 @@ public class MainActivity extends AppCompatActivity {
             });
 
     public void editItem(int pos) {
-        View view = LayoutInflater.from(this).inflate(R.layout.edit_item,null);
+        EditItemBinding editItemBinding = EditItemBinding.inflate(LayoutInflater.from(this));
 
         ListItem item = adapter.getList().get(pos);
 
@@ -1310,22 +1262,22 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        EditText nameTxt = view.findViewById(R.id.NameTxt);
-        EditText valueTxt = view.findViewById(R.id.ValueTxt);
+        EditText nameTxt = editItemBinding.NameTxt;
+        EditText valueTxt = editItemBinding.ValueTxt;
 
         if (item.getName() == null) {
-            view.findViewById(R.id.nameLL).setVisibility(GONE);
+            editItemBinding.nameLL.setVisibility(GONE);
         }else nameTxt.setText(adapter.getList().get(pos).getName());
 
         if (item.isArray() || item.isObject()) {
-            view.findViewById(R.id.valueLL).setVisibility(GONE);
+            editItemBinding.valueLL.setVisibility(GONE);
         }else valueTxt.setText(adapter.getList().get(pos).getValue());
 
         CustomViewDialog dialog = new CustomViewDialog();
         dialog.Builder(this, true)
                 .dialogWithTwoButtons()
                 .setTitle(getString(R.string.edit_item))
-                .addCustomView(view)
+                .addCustomView(editItemBinding.getRoot())
                 .onButtonClick(() -> {
 
                     if (item.getName() != null){

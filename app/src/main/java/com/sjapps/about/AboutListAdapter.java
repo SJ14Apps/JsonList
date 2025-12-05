@@ -9,8 +9,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-
-import com.sjapps.jsonlist.R;
+import com.sjapps.jsonlist.databinding.AboutListItemBinding;
 
 import java.util.ArrayList;
 
@@ -19,23 +18,20 @@ public class AboutListAdapter extends RecyclerView.Adapter<AboutListAdapter.View
     ArrayList<AboutListItem> Items;
 
     public static class ViewHolder extends RecyclerView.ViewHolder{
-        private final TextView NameTxt, ValueTxt;
-        LinearLayout layout;
-        public ViewHolder(View itemView) {
-            super(itemView);
-            NameTxt = itemView.findViewById(R.id.NameTxt);
-            ValueTxt = itemView.findViewById(R.id.ValueTxt);
-            layout = itemView.findViewById(R.id.layoutItem);
+        AboutListItemBinding binding;
+        public ViewHolder(AboutListItemBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
         }
 
         public TextView getNameTxt(){
-            return NameTxt;
+            return binding.NameTxt;
         }
         public TextView getValueTxt(){
-            return ValueTxt;
+            return binding.ValueTxt;
         }
         public LinearLayout getLayout(){
-            return layout;
+            return binding.layoutItem;
         }
         public View getView(){
             return itemView;
@@ -50,8 +46,8 @@ public class AboutListAdapter extends RecyclerView.Adapter<AboutListAdapter.View
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.about_list_item,parent,false);
-        return new ViewHolder(view);
+        AboutListItemBinding binding = AboutListItemBinding.inflate(LayoutInflater.from(parent.getContext()),parent,false);
+        return new ViewHolder(binding);
     }
 
     @Override

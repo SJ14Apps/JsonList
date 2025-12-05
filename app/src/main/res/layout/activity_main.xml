@@ -203,7 +203,7 @@
             android:layout_height="0dp"
             android:minWidth="50dp"
             android:minHeight="50dp"
-            app:layout_constraintBottom_toTopOf="@id/guideline"
+            app:layout_constraintBottom_toTopOf="@id/guidelineHorizontal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -364,13 +364,20 @@
 
 
         <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/guideline"
+            android:id="@+id/guidelineHorizontal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@color/Custom0"
             android:orientation="horizontal"
             app:layout_constraintGuide_percent="1" />
 
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guidelineVertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/Custom0"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="1" />
 
         <RelativeLayout
             android:id="@+id/rawJsonRL"
@@ -380,7 +387,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/guideline">
+            app:layout_constraintTop_toTopOf="@id/guidelineHorizontal">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -435,7 +442,7 @@
         >
 
         <LinearLayout
-            android:id="@+id/loadingView"
+            android:id="@+id/progressView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:minWidth="150dp"
@@ -453,7 +460,7 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/loadingTxt"
+                android:id="@+id/progressTxt"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/loading_data_from_file"

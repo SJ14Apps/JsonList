@@ -9,8 +9,8 @@ android {
         applicationId "com.sjapps.jsonlist"
         minSdk 23
         targetSdk 36
-        versionCode 54
-        versionName "1.8.2"
+        versionCode 55
+        versionName "1.8.3"
 
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -26,6 +26,10 @@ android {
         cruncherEnabled = false
     }
 
+    buildFeatures {
+        viewBinding true
+    }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -34,7 +38,7 @@ android {
         }
         debug {
             applicationIdSuffix '.debug'
-            versionNameSuffix ' dev 6'
+            versionNameSuffix ' dev 7'
         }
     }
     compileOptions {

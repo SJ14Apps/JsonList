@@ -10,7 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.sjapps.jsonlist.MainActivity;
-import com.sjapps.jsonlist.R;
+import com.sjapps.jsonlist.databinding.ListPathLayoutBinding;
 
 public class PathListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
@@ -22,19 +22,17 @@ public class PathListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     static class ViewHolder extends RecyclerView.ViewHolder{
 
-        TextView valTxt;
-        View btn;
+        ListPathLayoutBinding binding;
 
-        public ViewHolder(View itemView) {
-            super(itemView);
-            valTxt = itemView.findViewById(R.id.itemName);
-            btn = itemView.findViewById(R.id.btn);
+        public ViewHolder(ListPathLayoutBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
         }
         public TextView getValTxt(){
-            return valTxt;
+            return binding.itemName;
         }
         public View getBtn(){
-            return btn;
+            return binding.btn;
         }
 
         public View getView(){
@@ -53,8 +51,8 @@ public class PathListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_path_layout,parent,false);
-        return new ViewHolder(view);
+        ListPathLayoutBinding binding = ListPathLayoutBinding.inflate(LayoutInflater.from(parent.getContext()),parent,false);
+        return new ViewHolder(binding);
     }
 
     @Override
@@ -65,16 +63,14 @@ public class PathListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         int position = pos;
 
         ViewHolder currentHolder = (ViewHolder) holder;
-        View view = currentHolder.getView();
-        TextView valTxt = currentHolder.getValTxt();
-        valTxt.setText(item);
+        currentHolder.getValTxt().setText(item);
         currentHolder.getBtn().setOnClickListener(v -> {
             activity.goBack(getLast() - position);
         });
 
         if (position == getLast())
-            view.findViewById(R.id.arrow_img).setVisibility(View.GONE);
-        else view.findViewById(R.id.arrow_img).setVisibility(View.VISIBLE);
+            currentHolder.binding.arrowImg.setVisibility(View.GONE);
+        else currentHolder.binding.arrowImg.setVisibility(View.VISIBLE);
     }
 
     @Override

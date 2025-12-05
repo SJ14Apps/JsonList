@@ -20,9 +20,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.ScrollView;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,7 +32,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.text.HtmlCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
-import androidx.core.widget.NestedScrollView;
+
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -42,6 +40,8 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.sj14apps.jsonlist.core.controllers.WebManager;
 import com.sjapps.jsonlist.R;
+import com.sjapps.jsonlist.databinding.ActivityAboutBinding;
+import com.sjapps.jsonlist.databinding.FeedbackDialogBinding;
 import com.sjapps.library.customdialog.BasicDialog;
 import com.sjapps.library.customdialog.CustomViewDialog;
 import com.sjapps.library.customdialog.DialogButtonEvents;
@@ -64,11 +64,10 @@ public class AboutActivity extends AppCompatActivity {
     final String STORE_PACKAGE_NAME = "com.sjapps.sjstore";
     final String CONTACT_MAIL = "slavce14.apps@gmail.com";
 
+    private ActivityAboutBinding binding;
+
     ArrayAdapter<CharSequence> feedbackCategories;
 
-    ImageView logo;
-    NestedScrollView nestedScrollView;
-    RecyclerView ListRV, LibListRV;
     ArrayList<AboutListItem> appInfoItems = new ArrayList<>();
     ArrayList<AboutListItem> libsItems;
     boolean isStoreInstalled;
@@ -80,15 +79,16 @@ public class AboutActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_about);
+        binding = ActivityAboutBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
         initialize();
         setLayoutBounds();
         Animation animation = AnimationUtils.loadAnimation(this, R.anim.slide_from_bottom);
-        nestedScrollView.startAnimation(animation);
+        binding.nestedList.startAnimation(animation);
         PackageManager manager = getPackageManager();
         try {
             ApplicationInfo applicationInfo = manager.getApplicationInfo(getPackageName(), 0);
-            logo.setImageDrawable(applicationInfo.loadIcon(manager));
+            binding.logo.setImageDrawable(applicationInfo.loadIcon(manager));
 
             String Name = (String) manager.getApplicationLabel(applicationInfo);
             String Version = manager.getPackageInfo(getPackageName(), 0).versionName;
@@ -96,8 +96,8 @@ public class AboutActivity extends AppCompatActivity {
             appInfoItems.add(new AboutListItem(getString(R.string.name), Name));
             appInfoItems.add(new AboutListItem(getString(R.string.version), Version));
             libsItems = new LibraryList().getItems(this);
-            setupList(appInfoItems, ListRV);
-            setupList(libsItems, LibListRV);
+            setupList(appInfoItems, binding.aboutList);
+            setupList(libsItems, binding.LibrariesList);
 
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
@@ -106,7 +106,7 @@ public class AboutActivity extends AppCompatActivity {
     }
 
     private void setLayoutBounds() {
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.rootView), (v, windowInsets) -> {
+        ViewCompat.setOnApplyWindowInsetsListener(binding.rootView, (v, windowInsets) -> {
             Insets insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars());
             Insets insetsN = windowInsets.getInsets(WindowInsetsCompat.Type.displayCutout());
 
@@ -115,7 +115,7 @@ public class AboutActivity extends AppCompatActivity {
             layoutParams.leftMargin = insets.left + insetsN.left;
             layoutParams.topMargin = insets.top;
             layoutParams.rightMargin = insets.right + insetsN.right;
-            View scrollRL = findViewById(R.id.scrollRL);
+            View scrollRL = binding.scrollRL;
             scrollRL.setPadding(scrollRL.getPaddingLeft(), scrollRL.getPaddingTop(), scrollRL.getPaddingRight(), insets.bottom + insetsN.bottom);
             v.setLayoutParams(layoutParams);
             return WindowInsetsCompat.CONSUMED;
@@ -130,10 +130,6 @@ public class AboutActivity extends AppCompatActivity {
     }
 
     void initialize() {
-        logo = findViewById(R.id.logo);
-        ListRV = findViewById(R.id.aboutList);
-        LibListRV = findViewById(R.id.LibrariesList);
-        nestedScrollView = findViewById(R.id.nestedList);
         if (CheckStoreIsInstalled()) {
             isStoreInstalled = true;
         }
@@ -209,23 +205,21 @@ public class AboutActivity extends AppCompatActivity {
         }
     }
     public void SendFeedback(View view) {
-        View feedbackView = LayoutInflater.from(this).inflate(R.layout.feedback_dialog,null);
-        Spinner categorySpinner = feedbackView.findViewById(R.id.categorySpinner);
-        EditText editText = feedbackView.findViewById(R.id.feedbackTxt);
+        FeedbackDialogBinding dialogBinding = FeedbackDialogBinding.inflate(LayoutInflater.from(this));
 
         feedbackCategories = ArrayAdapter.createFromResource(this, R.array.feedback_categories, android.R.layout.simple_spinner_item);
         feedbackCategories.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        categorySpinner.setAdapter(feedbackCategories);
+        dialogBinding.categorySpinner.setAdapter(feedbackCategories);
 
-        categorySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        dialogBinding.categorySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if (position != 0){
-                    editText.setVisibility(View.VISIBLE);
-                    focusEditText(editText);
+                    dialogBinding.feedbackTxt.setVisibility(View.VISIBLE);
+                    focusEditText(dialogBinding.feedbackTxt);
                 }
-                else editText.setVisibility(View.GONE);
-                focusEditText(editText);
+                else dialogBinding.feedbackTxt.setVisibility(View.GONE);
+                focusEditText(dialogBinding.feedbackTxt);
             }
 
             @Override
@@ -239,11 +233,11 @@ public class AboutActivity extends AppCompatActivity {
                 .setTitle(getString(R.string.feedback_dialog_title))
                 .setMessage(getString(R.string.feedback_dialog_message))
                 .setMessageAlignment(SJDialog.TEXT_ALIGNMENT_CENTER)
-                .addCustomView(feedbackView)
+                .addCustomView(dialogBinding.getRoot())
                 .dialogWithTwoButtons()
                 .setRightButtonText(getString(R.string.send))
                 .onButtonClick(() -> {
-                    validateAndSend(dialog,categorySpinner.getSelectedItemPosition(),editText.getText().toString());
+                    validateAndSend(dialog,dialogBinding.categorySpinner.getSelectedItemPosition(),dialogBinding.feedbackTxt.getText().toString());
                 })
                 .show();
     }
