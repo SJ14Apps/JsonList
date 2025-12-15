@@ -97,7 +97,7 @@
     <string name="editing_root_item_not_available">Editing a root item is not available!</string>
     <string name="rename_all">Rename all</string>
     <string name="rename_all_s_key_with_s">Rename all \'%s\' key with \'%s\'?</string>
-
+    <string name="applying_changes">Applying changes…</string>
 
     <!--  Themes  -->
     <string name="theme">Theme</string>

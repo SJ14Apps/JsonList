@@ -439,14 +439,21 @@ public class MainActivity extends AppCompatActivity {
             hideBackBtnIfNotNeeded();
 
             if (isEdited){
-                data.setRawData(JsonFunctions.convertToRawString(data.getRootList()));
-                isEdited = false;
-                rawJsonView.isRawJsonLoaded = false;
-                unsavedChanges = true;
-                binding.saveBtn.setVisibility(VISIBLE);
-                if (rawJsonView.showJson){
-                    rawJsonView.ShowJSON();
-                }
+                loadingStarted(getString(R.string.applying_changes));
+                new Thread(() -> {
+                    data.setRawData(JsonFunctions.convertToRawString(data.getRootList()));
+                    handler.post(()->{
+                        loadingFinished(true);
+                        isEdited = false;
+                        rawJsonView.isRawJsonLoaded = false;
+                        unsavedChanges = true;
+                        binding.saveBtn.setVisibility(VISIBLE);
+                        if (rawJsonView.showJson){
+                            rawJsonView.ShowJSON();
+                        }
+                    });
+                }).start();
+
             }else if (unsavedChanges)
                 binding.saveBtn.setVisibility(VISIBLE);
         }
