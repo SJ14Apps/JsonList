@@ -106,11 +106,7 @@ public class AndroidRawJsonView extends RawJsonView {
 
         Thread thread = new Thread(() -> {
             String dataStr = JsonFunctions.getAsPrettyPrint(mainActivity.data.getRawData());
-            mainActivity.handler.post(()-> {
-                updateRawJson(dataStr);
-                mainActivity.loadingFinished(true);
-                isRawJsonLoaded = true;
-            });
+            updateRawJson(dataStr);
         });
         thread.setName("loadingJson");
         thread.start();
@@ -118,7 +114,12 @@ public class AndroidRawJsonView extends RawJsonView {
 
     public void updateRawJson(String json) {
         String htmlData = generateHtml(json,mainActivity.state);
-        mainBinding.rawJsonWV.loadDataWithBaseURL(null, htmlData, "text/html", "UTF-8", null);
+        mainActivity.handler.post(() -> {
+            mainBinding.rawJsonWV.loadDataWithBaseURL(null, htmlData, "text/html", "UTF-8", null);
+            if (mainActivity.binding.progressView.getVisibility() == View.VISIBLE)
+                mainActivity.loadingFinished(true);
+            isRawJsonLoaded = true;
+        });
     }
 
 }
