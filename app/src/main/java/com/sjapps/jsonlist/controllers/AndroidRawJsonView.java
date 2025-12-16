@@ -116,7 +116,7 @@ public class AndroidRawJsonView extends RawJsonView {
         String htmlData = generateHtml(json,mainActivity.state);
         mainActivity.handler.post(() -> {
             mainBinding.rawJsonWV.loadDataWithBaseURL(null, htmlData, "text/html", "UTF-8", null);
-            if (mainActivity.binding.progressView.getVisibility() == View.VISIBLE)
+            if (mainActivity.isLoading)
                 mainActivity.loadingFinished(true);
             isRawJsonLoaded = true;
         });

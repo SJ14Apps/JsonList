@@ -117,6 +117,7 @@ public class MainActivity extends AppCompatActivity {
     boolean isEdited;
     boolean isApplyingChanges;
     public boolean isEditMode;
+    public boolean isLoading;
     boolean unsavedChanges;
 
     public Guideline guideline;
@@ -623,6 +624,8 @@ public class MainActivity extends AppCompatActivity {
             return;
         if (isApplyingChanges)
             return;
+        if ((readFileThread != null && readFileThread.isAlive()) || isUrlSearching)
+            return;
 
 
         binding.floatingToolbar.animate().cancel();
@@ -999,6 +1002,7 @@ public class MainActivity extends AppCompatActivity {
         });
         readFileThread.setName("readFileThread");
         readFileThread.start();
+        hideToolbar();
     }
 
     void WriteFile(Uri uri){
@@ -1036,6 +1040,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void loadingStarted(String txt){
+        isLoading = true;
         TextView text =  binding.progressTxt;
         binding.progressBar.setIndeterminate(true);
         text.setText(txt);
@@ -1052,6 +1057,7 @@ public class MainActivity extends AppCompatActivity {
     public void loadingFinished(boolean isFinished){
 
         if (!isFinished){
+            isLoading = false;
             handler.postDelayed(()-> {
                 functions.setAnimation(this, binding.progressView,R.anim.scale_out);
                 binding.progressView.setVisibility(INVISIBLE);
@@ -1186,6 +1192,7 @@ public class MainActivity extends AppCompatActivity {
         public void onStarted() {
             hideUrlSearchView();
             loadingStarted();
+            hideToolbar();
             isUrlSearching = true;
         }
 
