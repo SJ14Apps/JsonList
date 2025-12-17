@@ -5,6 +5,7 @@ import com.google.android.material.snackbar.Snackbar;
 import com.sjapps.jsonlist.MainActivity;
 import com.sjapps.jsonlist.R;
 import com.sj14apps.jsonlist.core.controllers.FileManager;
+import com.sjapps.library.customdialog.DialogButtonEvents;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,6 +20,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.provider.OpenableColumns;
+import android.view.View;
 
 public class AndroidFileManager implements FileManager {
 
@@ -43,6 +45,23 @@ public class AndroidFileManager implements FileManager {
         }
         if (activity.state == null)
             activity.LoadStateData();
+
+        if (activity.unsavedChanges){
+            activity.showUnsavedChangesDialog(new DialogButtonEvents() {
+                @Override
+                public void onLeftButtonClick() {
+                    activity.unsavedChanges = false;
+                    activity.binding.saveBtn.setVisibility(View.GONE);
+                    importFromFile();
+                }
+
+                @Override
+                public void onRightButtonClick() {
+                   activity.saveChanges();
+                }
+            });
+            return;
+        }
 
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
