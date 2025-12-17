@@ -2,6 +2,8 @@ package com.sj14apps.jsonlist.core.controllers;
 
 import com.sj14apps.jsonlist.core.AppState;
 
+import java.util.regex.Pattern;
+
 public abstract class RawJsonView{
 
 
@@ -52,15 +54,23 @@ public abstract class RawJsonView{
                 "</html>";
     }
 
+    private static final Pattern KEY_PATTERN = Pattern.compile("\"([^\"]*)\"(?=\\s*:)");
+    private static final Pattern STRING_PATTERN = Pattern.compile(":\\s*\"([^\"]*)\"");
+    private static final Pattern NUMBER_PATTERN = Pattern.compile(":\\s*(-?\\d+(?:\\.\\d+)?)");
+    private static final Pattern BOOLEAN_PATTERN = Pattern.compile(":\\s*(true|false)");
+    private static final Pattern NULL_PATTERN = Pattern.compile(":\\s*(null)");
+
     private String highlightJsonSyntax(String json) {
         json = json.replaceAll("&", "&amp;")
                 .replaceAll("<", "&lt;")
-                .replaceAll(">", "&gt;")
-                .replaceAll("\"(.*?)\"(?=\\s*:)", "<span class='key'>\"$1\"</span>") // Keys
-                .replaceAll(":\\s*\"(.*?)\"", ": <span class='string'>\"$1\"</span>") // Strings
-                .replaceAll(":\\s*(-?\\d+(\\.\\d+)?)", ": <span class='number'>$1</span>") // Numbers
-                .replaceAll(":\\s*(true|false)", ": <span class='boolean'>$1</span>") // Booleans
-                .replaceAll(":\\s*(null)", ": <span class='null'>$1</span>"); // Null
+                .replaceAll(">", "&gt;");
+
+        json = KEY_PATTERN.matcher(json).replaceAll("<span class='key'>\"$1\"</span>"); // Keys
+        json = STRING_PATTERN.matcher(json).replaceAll(": <span class='string'>\"$1\"</span>"); // Strings
+        json = NUMBER_PATTERN.matcher(json).replaceAll(": <span class='number'>$1</span>"); // Numbers
+        json = BOOLEAN_PATTERN.matcher(json).replaceAll(": <span class='boolean'>$1</span>"); // Booleans
+        json = NULL_PATTERN.matcher(json).replaceAll(": <span class='null'>$1</span>"); // Null
+
         return json;
     }
 
