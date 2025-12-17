@@ -115,8 +115,10 @@ public class MainActivity extends AppCompatActivity {
     boolean isMenuOpen;
     boolean isTopMenuVisible;
     boolean isEdited;
+    boolean isApplyingChanges;
     public boolean isEditMode;
-    boolean unsavedChanges;
+    public boolean isLoading;
+    public boolean unsavedChanges;
 
     public Guideline guideline;
 
@@ -439,14 +441,25 @@ public class MainActivity extends AppCompatActivity {
             hideBackBtnIfNotNeeded();
 
             if (isEdited){
-                data.setRawData(JsonFunctions.convertToRawString(data.getRootList()));
-                isEdited = false;
-                rawJsonView.isRawJsonLoaded = false;
-                unsavedChanges = true;
-                binding.saveBtn.setVisibility(VISIBLE);
-                if (rawJsonView.showJson){
-                    rawJsonView.ShowJSON();
-                }
+                loadingStarted(getString(R.string.applying_changes));
+                isApplyingChanges = true;
+                new Thread(() -> {
+                    if (!data.getRawData().equals("-1"))
+                        data.setRawData(JsonFunctions.convertToRawString(data.getRootList()));
+                    handler.post(()->{
+                        loadingFinished(true);
+                        isEdited = false;
+                        rawJsonView.isRawJsonLoaded = false;
+                        unsavedChanges = true;
+                        isApplyingChanges = false;
+                        binding.saveBtn.setVisibility(VISIBLE);
+                        if (rawJsonView.showJson){
+                            rawJsonView.ShowJSON();
+                        }
+                        showToolbar();
+                    });
+                }).start();
+
             }else if (unsavedChanges)
                 binding.saveBtn.setVisibility(VISIBLE);
         }
@@ -509,27 +522,17 @@ public class MainActivity extends AppCompatActivity {
             if (data.isEmptyPath()){
 
                 if (unsavedChanges){
-                    BasicDialog dialog = new BasicDialog();
-                    dialog.Builder(MainActivity.this, true)
-                            .setTitle(getString(R.string.save_changes))
-                            .setMessage(getString(R.string.unsaved_changes_msg))
-                            .setLeftButtonText(getString(R.string.dismiss))
-                            .setRightButtonText(getString(R.string.save))
+                    showUnsavedChangesDialog(new DialogButtonEvents() {
+                        @Override
+                        public void onLeftButtonClick() {
+                            MainActivity.this.finish();
+                        }
 
-                            .onButtonClick(new DialogButtonEvents() {
-                                @Override
-                                public void onLeftButtonClick() {
-                                    dialog.dismiss();
-                                    MainActivity.this.finish();
-                                }
-
-                                @Override
-                                public void onRightButtonClick() {
-                                    dialog.dismiss();
-                                    saveChanges();
-                                }
-                            })
-                            .show();
+                        @Override
+                        public void onRightButtonClick() {
+                            saveChanges();
+                        }
+                    });
                     return;
                 }
 
@@ -552,7 +555,43 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    private void saveChanges() {
+    public void showUnsavedChangesDialog(DialogButtonEvents buttonEvents){
+        BasicDialog dialog = new BasicDialog();
+        dialog.Builder(MainActivity.this, true)
+                .setTitle(getString(R.string.save_changes))
+                .setMessage(getString(R.string.unsaved_changes_msg))
+                .setLeftButtonText(getString(R.string.dismiss))
+                .setRightButtonText(getString(R.string.save))
+
+                .onButtonClick(new DialogButtonEvents() {
+                    @Override
+                    public void onLeftButtonClick() {
+                        dialog.dismiss();
+                        buttonEvents.onLeftButtonClick();
+                    }
+
+                    @Override
+                    public void onRightButtonClick() {
+                        dialog.dismiss();
+                        buttonEvents.onRightButtonClick();
+                    }
+                })
+                .show();
+    }
+
+    public void saveChanges() {
+        if ((readFileThread != null && readFileThread.isAlive())) {
+            if (readFileThread.getName().equals("writeFileThread"))
+                Snackbar.make(getWindow().getDecorView(), R.string.saving_file_in_progress, BaseTransientBottomBar.LENGTH_SHORT).show();
+            else Snackbar.make(getWindow().getDecorView(), R.string.loading_file_in_progress, BaseTransientBottomBar.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (isUrlSearching) {
+            Snackbar.make(getWindow().getDecorView(), R.string.loading_file_in_progress, BaseTransientBottomBar.LENGTH_SHORT).show();
+            return;
+        }
+
         fileManager.saveFile(data.getFileName());
     }
 
@@ -610,6 +649,11 @@ public class MainActivity extends AppCompatActivity {
     private void showToolbar() {
         if (isEditMode)
             return;
+        if (isApplyingChanges)
+            return;
+        if ((readFileThread != null && readFileThread.isAlive()) || isUrlSearching)
+            return;
+
 
         binding.floatingToolbar.animate().cancel();
 
@@ -657,6 +701,23 @@ public class MainActivity extends AppCompatActivity {
     private void showUrlSearchView() {
         if ((readFileThread != null && readFileThread.isAlive()) || isUrlSearching) {
             Snackbar.make(getWindow().getDecorView(), R.string.loading_file_in_progress, BaseTransientBottomBar.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (unsavedChanges){
+            showUnsavedChangesDialog(new DialogButtonEvents() {
+                @Override
+                public void onLeftButtonClick() {
+                    unsavedChanges = false;
+                    binding.saveBtn.setVisibility(GONE);
+                    showUrlSearchView();
+                }
+
+                @Override
+                public void onRightButtonClick() {
+                    saveChanges();
+                }
+            });
             return;
         }
 
@@ -985,6 +1046,7 @@ public class MainActivity extends AppCompatActivity {
         });
         readFileThread.setName("readFileThread");
         readFileThread.start();
+        hideToolbar();
     }
 
     void WriteFile(Uri uri){
@@ -998,6 +1060,9 @@ public class MainActivity extends AppCompatActivity {
             OutputStream outputStream = getContentResolver().openOutputStream(uri);
 
             readFileThread = new Thread(() -> {
+                if (data.getRawData().equals("-1"))
+                    data.setRawData(JsonFunctions.convertToRawString(data.getRootList()));
+
                 fileManager.writeFile(outputStream, data.getRawData(), fileWriteCallback);
             });
             readFileThread.setName("writeFileThread");
@@ -1023,6 +1088,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void loadingStarted(String txt){
+        isLoading = true;
         TextView text =  binding.progressTxt;
         binding.progressBar.setIndeterminate(true);
         text.setText(txt);
@@ -1039,6 +1105,7 @@ public class MainActivity extends AppCompatActivity {
     public void loadingFinished(boolean isFinished){
 
         if (!isFinished){
+            isLoading = false;
             handler.postDelayed(()-> {
                 functions.setAnimation(this, binding.progressView,R.anim.scale_out);
                 binding.progressView.setVisibility(INVISIBLE);
@@ -1173,6 +1240,7 @@ public class MainActivity extends AppCompatActivity {
         public void onStarted() {
             hideUrlSearchView();
             loadingStarted();
+            hideToolbar();
             isUrlSearching = true;
         }
 
