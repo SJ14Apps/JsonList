@@ -994,7 +994,7 @@ public class MainActivity extends AppCompatActivity {
         loadingStarted(getString(R.string.saving_file));
 
         try {
-            OutputStream outputStream = getContentResolver().openOutputStream(uri);
+            OutputStream outputStream = getContentResolver().openOutputStream(uri,"wt");
 
             readFileThread = new Thread(() -> {
                 fileManager.writeFile(outputStream, data.getRawData(), fileWriteCallback);
