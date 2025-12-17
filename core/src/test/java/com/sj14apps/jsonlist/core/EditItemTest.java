@@ -51,6 +51,20 @@ public class EditItemTest {
     }
 
     @Test
+    public void EditNumbers(){
+        String input = "[1, 2.2, -3, -4.4]";
+        String expected = "[\"01\", \"02.2\", \"-03\", \"-04.4\"]";
+
+        ArrayList<ListItem> rootList = JsonFunctions.getJsonArrayRoot(JsonParser.parseString(input).getAsJsonArray());
+        ArrayList<ArrayList<ListItem>> items = rootList.get(0).getListObjects();
+        items.get(0).get(0).setValue("01");
+        items.get(1).get(0).setValue("02.2");
+        items.get(2).get(0).setValue("-03");
+        items.get(3).get(0).setValue("-04.4");
+        assertJsonEqual(JsonFunctions.convertToRawString(rootList),expected);
+    }
+
+    @Test
     public void EditRootArrayName(){
         String input = "[\"test\", 30, true]";
         String expected = "[\"test\", 30, true]";

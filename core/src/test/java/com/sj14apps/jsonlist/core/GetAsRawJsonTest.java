@@ -43,6 +43,11 @@ public class GetAsRawJsonTest {
     }
 
     @Test
+    public void testArrayOfNumbersStartsWithZero() {
+        assertJsonEqual("{\"values\":[01,02.2,-3,-4.4]}");
+    }
+
+    @Test
     public void testArrayOfObjects() {
         assertJsonEqual("{\"users\":[{\"name\":\"Alice\"},{\"name\":\"Bob\"}]}");
     }
