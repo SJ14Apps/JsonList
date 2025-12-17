@@ -30,10 +30,28 @@ jobs:
       if: always()
       run: |
         echo "### Unit Test Summary" >> $GITHUB_STEP_SUMMARY
+    
         TEST_RESULTS=$(find core/build/test-results/test -name "*.xml")
+        
+        # Count total tests, failures, skipped
         PASSED=$(grep -o 'testsuite.*tests="[^"]*"' $TEST_RESULTS | sed -n 's/.*tests="\([0-9]*\)".*/\1/p' | awk '{s+=$1} END {print s}')
         FAILURES=$(grep -o 'testsuite.*failures="[^"]*"' $TEST_RESULTS | sed -n 's/.*failures="\([0-9]*\)".*/\1/p' | awk '{s+=$1} END {print s}')
         SKIPPED=$(grep -o 'testsuite.*skipped="[^"]*"' $TEST_RESULTS | sed -n 's/.*skipped="\([0-9]*\)".*/\1/p' | awk '{s+=$1} END {print s}')
+        
         echo "- ✅ Passed: $((PASSED - FAILURES - SKIPPED))" >> $GITHUB_STEP_SUMMARY
         echo "- ❌ Failed: $FAILURES" >> $GITHUB_STEP_SUMMARY
         echo "- ⏭️ Skipped: $SKIPPED" >> $GITHUB_STEP_SUMMARY
+    
+        # Show detailed failure messages
+        if [ "$FAILURES" -gt 0 ]; then
+          echo "### ❌ Test Failures" >> $GITHUB_STEP_SUMMARY
+          for file in $TEST_RESULTS; do
+            # Extract <testcase> elements with <failure> inside
+            grep -Poz '<testcase[^>]*>\K.*?(?=</testcase>)' "$file" | grep -Poz '<failure[^>]*>.*?</failure>' | while read -r line; do
+              MSG=$(echo "$line" | sed -E 's/<failure[^>]*>(.*)<\/failure>/\1/' | tr -d '\n')
+              TESTNAME=$(echo "$file" | sed 's#.*/##')
+              echo "- $TESTNAME: $MSG" >> $GITHUB_STEP_SUMMARY
+            done
+          done
+        fi
+
