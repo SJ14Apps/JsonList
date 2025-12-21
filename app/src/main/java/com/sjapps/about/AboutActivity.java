@@ -55,14 +55,14 @@ import java.util.List;
 
 public class AboutActivity extends AppCompatActivity {
 
-    private static final String SITE_APP_VERSIONS = "https://slavce14.github.io/redirect?link=jsonlist-app-versions";
-    private static final String RELEASE_NOTES_URL = "https://slavce14.github.io/apps/JsonList/changelogs.json";
-    private static final String SITE_FDroid = "https://slavce14.github.io/redirect?link=jsonlist-fdroid";
-    private static final String SITE_IzzyOnDroid = "https://slavce14.github.io/redirect?link=jsonlist-izzy";
+    private static final String SITE_APP_VERSIONS = "https://redirect.sj14apps.com/jsonlist-app-versions";
+    private static final String RELEASE_NOTES_URL = "https://redirect.sj14apps.com/jsonlist-changelogs";
+    private static final String SITE_FDroid = "https://redirect.sj14apps.com/jsonlist-fdroid";
+    private static final String SITE_IzzyOnDroid = "https://redirect.sj14apps.com/jsonlist-izzy";
     private static final String SITE_PlayStore = "https://play.google.com/store/apps/details?id=com.sjapps.jsonlist";
     private static final String GITHUB_REPOSITORY_RELEASES = "https://github.com/SlaVcE14/JsonList/releases";
     final String STORE_PACKAGE_NAME = "com.sjapps.sjstore";
-    final String CONTACT_MAIL = "slavce14.apps@gmail.com";
+    final String CONTACT_MAIL = "info@sj14apps.com";
 
     private ActivityAboutBinding binding;
 
