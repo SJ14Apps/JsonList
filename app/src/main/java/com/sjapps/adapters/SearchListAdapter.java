@@ -75,7 +75,7 @@ public class SearchListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         pathTxt.setText(pathStr);
         currentHolder.getBtn().setOnClickListener(v -> {
             System.out.println("Search: " + item.id);
-            activity.hideSearchView();
+            activity.searchController.hideSearchView();
             activity.open(JsonData.getPathFormat(item.path),item.path,-1);
             activity.highlightItem(item.id);
         });
