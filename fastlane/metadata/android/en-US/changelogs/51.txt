@@ -1,0 +1,16 @@
+Bugfix
+- correct handling for escape sequences (\n, \t, \r...) 
+
+New
+- Resizable Split View
+- Search
+- Release Notes
+
+Updates
+- UI Update
+ > Tool menu
+ > Progress bar
+ > Save Button position
+- Update edit mode
+ > Now you can change all key names that has same name in a list at once
+- Update animations
