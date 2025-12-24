@@ -303,6 +303,10 @@ public class JsonFunctions {
     public static void searchItem(ArrayList<ListItem> list,ArrayList<SearchItem> searchItems, String path, String val,int searchMode,int currentID,int arrayId){
 
         for (ListItem item : list){
+            if (Thread.currentThread().isInterrupted()){
+                return;
+            }
+
             if (searchMode != 2 && item.getName() != null && item.getName().toLowerCase().contains(val)){
                 searchItems.add(new SearchItem(item.getName(),path,currentID,arrayId));
             }

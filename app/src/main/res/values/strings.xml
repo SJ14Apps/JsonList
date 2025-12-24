@@ -89,7 +89,8 @@
     <string name="fail_to_get_data">Fail to get data</string>
 
     <!--  Search  -->
-    <string name="search">search</string>
+    <string name="search">Search</string>
+    <string name="searching">Searching…</string>
 
     <!-- Editing -->
     <string name="editing_in_progress">Editing in progress</string>
