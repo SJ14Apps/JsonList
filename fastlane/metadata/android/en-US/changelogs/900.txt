@@ -1,6 +1,6 @@
 Bugfix
-- Fix bug when saving and overwriting file produces invalid JSON
-- Fix bug when large data tries to display in row JSON View  
+- Fixed an issue where overwriting a file could result in invalid JSON
+- Fixed bug when large data tries to display in raw JSON View  
 
 Optimization
 - Working with large data is more faster
