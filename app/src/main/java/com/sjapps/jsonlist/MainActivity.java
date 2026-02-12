@@ -24,6 +24,8 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.Configuration;
 import android.net.Uri;
@@ -118,6 +120,7 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         checkCrashLogs();
         LoadStateData();
+        checkHasNewVersion();
         Log.d(TAG, "onResume: resume");
     }
 
@@ -510,6 +513,46 @@ public class MainActivity extends AppCompatActivity {
         logBtn.setTextColor(typedValue.data);
         logBtn.setBackgroundResource(R.drawable.ripple_list2);
         binding.menuBtn.setImageResource(R.drawable.ic_menu);
+    }
+
+    void checkHasNewVersion() {
+        long currentSeconds = System.currentTimeMillis()/1000;
+
+        TypedValue typedValue = new TypedValue();
+        TextView aboutBtn = binding.menu.aboutBtn;
+
+        getTheme().resolveAttribute(R.attr.colorOnSurfaceVariant, typedValue, true);
+        aboutBtn.setTextColor(typedValue.data);
+        aboutBtn.setBackgroundResource(R.drawable.ripple_list2);
+
+        if (currentSeconds - state.getLastCheckForUpdate() < 86400){
+            return;
+        }
+
+        try {
+            PackageInfo packageInfo = getPackageManager().getPackageInfo(MainActivity.this.getPackageName(), 0);
+            int currentVersionCode = packageInfo.versionCode;
+            WebManager webManager = new WebManager();
+            webManager.checkHasNewVersion(state, AboutActivity.APP_INFO_URL, currentVersionCode, new WebManager.CheckNewVersionCallback() {
+                @Override
+                public void saveState() {
+                    FileSystem.SaveState(MainActivity.this,state);
+                }
+
+                @Override
+                public void updateUI() {
+                    getTheme().resolveAttribute(R.attr.colorOnPrimary, typedValue, true);
+                    aboutBtn.setTextColor(typedValue.data);
+                    aboutBtn.setBackgroundResource(R.drawable.ripple_button);
+                    binding.menuBtn.setImageResource(R.drawable.menu_with_dot);
+                }
+            });
+
+        } catch (PackageManager.NameNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
+
     }
 
     private void OpenSettings() {

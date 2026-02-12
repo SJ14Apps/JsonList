@@ -38,7 +38,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.sj14apps.jsonlist.core.AppState;
 import com.sj14apps.jsonlist.core.controllers.WebManager;
+import com.sjapps.jsonlist.FileSystem;
 import com.sjapps.jsonlist.R;
 import com.sjapps.jsonlist.databinding.ActivityAboutBinding;
 import com.sjapps.jsonlist.databinding.FeedbackDialogBinding;
@@ -56,6 +58,7 @@ import java.util.List;
 public class AboutActivity extends AppCompatActivity {
 
     private static final String SITE_APP_VERSIONS = "https://redirect.sj14apps.com/jsonlist-app-versions";
+    public static final String APP_INFO_URL = "https://redirect.sj14apps.com/jsonlist-app-info";
     private static final String RELEASE_NOTES_URL = "https://redirect.sj14apps.com/jsonlist-changelogs";
     private static final String SITE_FDroid = "https://redirect.sj14apps.com/jsonlist-fdroid";
     private static final String SITE_IzzyOnDroid = "https://redirect.sj14apps.com/jsonlist-izzy";
@@ -99,10 +102,11 @@ public class AboutActivity extends AppCompatActivity {
             setupList(appInfoItems, binding.aboutList);
             setupList(libsItems, binding.LibrariesList);
 
+            checkNewVersion(manager.getPackageInfo(getPackageName(),0).versionCode);
+
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
-
     }
 
     private void setLayoutBounds() {
@@ -133,6 +137,16 @@ public class AboutActivity extends AppCompatActivity {
         if (CheckStoreIsInstalled()) {
             isStoreInstalled = true;
         }
+    }
+
+    private void checkNewVersion(int versionCode) {
+        AppState appState = FileSystem.loadStateData(this);
+        if (appState.getNewVersionCode() > versionCode){
+            String txt = getString(R.string.new_version_available) + "\n" + appState.getNewVersionName();
+            binding.newVersionAvailableTxt.setText(txt);
+            binding.newVersionAvailable.setVisibility(View.VISIBLE);
+        }
+
     }
 
     public void CheckForUpdate(View view) {

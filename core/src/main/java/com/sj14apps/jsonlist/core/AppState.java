@@ -1,13 +1,18 @@
 package com.sj14apps.jsonlist.core;
 
 public class AppState {
+    public int settingsVersion;
     boolean hasNewCrash;
     boolean hasCrashLogs;
     boolean MIMEFilterDisabled;
     boolean syntaxHighlighting = true;
     boolean scrollAnimation = true;
-    boolean autoCheckForUpdate;
+    boolean autoCheckForUpdate = true;
     private int theme;
+    long lastCheckForUpdate;
+    boolean hasNewVersion;
+    int newVersionCode = 0;
+    String newVersionName = "1.0";
 
     public boolean hasNewCrash() {
         return hasNewCrash;
@@ -65,15 +70,53 @@ public class AppState {
         this.theme = theme;
     }
 
+    public long getLastCheckForUpdate() {
+        return lastCheckForUpdate;
+    }
+
+    public boolean isHasNewVersion() {
+        return hasNewVersion;
+    }
+
+    public void setHasNewVersion(boolean hasNewVersion) {
+        this.hasNewVersion = hasNewVersion;
+    }
+
+    public int getNewVersionCode() {
+        return newVersionCode;
+    }
+
+    public void setNewVersionCode(int newVersionCode) {
+        this.newVersionCode = newVersionCode;
+    }
+
+    public void setLastCheckForUpdate(long lastCheckForUpdate) {
+        this.lastCheckForUpdate = lastCheckForUpdate;
+    }
+
+    public String getNewVersionName() {
+        return newVersionName;
+    }
+
+    public void setNewVersionName(String newVersionName) {
+        this.newVersionName = newVersionName;
+    }
+
     @Override
     public String toString() {
         return "AppState{" +
-                "hasNewCrash=" + hasNewCrash +
+                "settingsVersion=" + settingsVersion +
+                ", hasNewCrash=" + hasNewCrash +
                 ", hasCrashLogs=" + hasCrashLogs +
                 ", MIMEFilterDisabled=" + MIMEFilterDisabled +
                 ", syntaxHighlighting=" + syntaxHighlighting +
+                ", scrollAnimation=" + scrollAnimation +
                 ", autoCheckForUpdate=" + autoCheckForUpdate +
                 ", theme=" + theme +
+                ", lastCheckForUpdate=" + lastCheckForUpdate +
+                ", hasNewVersion=" + hasNewVersion +
+                ", newVersionCode=" + newVersionCode +
+                ", newVersionName='" + newVersionName + '\'' +
                 '}';
     }
 }

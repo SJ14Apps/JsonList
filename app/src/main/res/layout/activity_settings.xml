@@ -57,21 +57,31 @@
             android:showDividers="middle">
 
 
-            <com.google.android.material.materialswitch.MaterialSwitch
-                android:id="@+id/CheckForUpdateSwitch"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:minHeight="50dp"
-                android:paddingHorizontal="20dp"
-                android:text="@string/checking_for_update"
-                android:textSize="20dp"
-                android:textColor="?colorOnSurfaceVariant"
-                android:background="@drawable/ripple_list2"
                 android:layout_marginBottom="10dp"
-                android:enabled="false"
-                android:visibility="gone"
-                />
+                android:background="@drawable/ripple_list2"
+                android:orientation="vertical">
 
+                <com.google.android.material.materialswitch.MaterialSwitch
+                    android:id="@+id/CheckForUpdateSwitch"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="50dp"
+                    android:paddingHorizontal="20dp"
+                    android:text="@string/auto_check_for_update"
+                    android:textSize="20dp"
+                    android:textColor="?colorOnSurfaceVariant" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/auto_check_for_update_description"
+                    android:paddingHorizontal="20dp"
+                    android:layout_marginBottom="10dp"
+                    />
+            </LinearLayout>
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

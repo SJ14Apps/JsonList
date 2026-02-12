@@ -40,7 +40,8 @@
     <string name="SHighlighting_description">Syntax Highlighting for the raw JSON text</string>
     <string name="scrollAnimation">Scroll Animation</string>
     <string name="scrollAnimation_description">Disable this for large data, in may take very long time to animate the scroll</string>
-    <string name="checking_for_update">Enable checking for update</string>
+    <string name="auto_check_for_update">Automatically check for update</string>
+    <string name="auto_check_for_update_description">check if there is a new version and notify in the app</string>
     <string name="beta">Beta</string>
 
     <!--  Crash logs Page -->
@@ -119,6 +120,7 @@
     <string name="send">Send</string>
     <string name="select_category">Select category!</string>
     <string name="empty_text_field">The text field is empty!</string>
+    <string name="new_version_available">New version available</string>
 
     <string-array name="feedback_categories">
         <item>Select category</item>
