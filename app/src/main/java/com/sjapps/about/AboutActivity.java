@@ -60,7 +60,7 @@ public class AboutActivity extends AppCompatActivity {
     private static final String SITE_FDroid = "https://redirect.sj14apps.com/jsonlist-fdroid";
     private static final String SITE_IzzyOnDroid = "https://redirect.sj14apps.com/jsonlist-izzy";
     private static final String SITE_PlayStore = "https://play.google.com/store/apps/details?id=com.sjapps.jsonlist";
-    private static final String GITHUB_REPOSITORY_RELEASES = "https://github.com/SlaVcE14/JsonList/releases";
+    private static final String GITHUB_REPOSITORY_RELEASES = "https://github.com/SJ14Apps/JsonList/releases";
     final String STORE_PACKAGE_NAME = "com.sjapps.sjstore";
     final String CONTACT_MAIL = "info@sj14apps.com";
 
