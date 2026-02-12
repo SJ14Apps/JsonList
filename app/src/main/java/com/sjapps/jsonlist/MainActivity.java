@@ -52,8 +52,6 @@ import android.widget.Toast;
 import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
 
-import com.google.gson.Gson;
-import com.sj14apps.jsonlist.core.AppInfo;
 import com.sj14apps.jsonlist.core.JsonFunctions;
 import com.sj14apps.jsonlist.core.controllers.SearchController;
 import com.sjapps.about.AboutActivity;
@@ -520,7 +518,6 @@ public class MainActivity extends AppCompatActivity {
     void checkHasNewVersion() {
         long currentSeconds = System.currentTimeMillis()/1000;
 
-
         TypedValue typedValue = new TypedValue();
         TextView aboutBtn = binding.menu.aboutBtn;
 
@@ -532,61 +529,29 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        state.setLastCheckForUpdate(currentSeconds);
-
-        FileSystem.SaveState(this,state);
-
-        WebManager webManager = new WebManager();
-        webManager.getFromUrl(AboutActivity.APP_INFO_URL, new WebManager.WebCallback() {
-            @Override
-            public void onStarted() {
-                System.out.println("Started");
-            }
-
-            @Override
-            public void onInvalidURL() {
-                System.out.println("Invalid URL");
-            }
-
-            @Override
-            public void onResponse(String data) {
-                AppInfo info = new Gson().fromJson(data, AppInfo.class);
-                if (info == null)
-                    return;
-                try {
-                    PackageInfo packageInfo = getPackageManager().getPackageInfo(MainActivity.this.getPackageName(), 0);
-                    int versionCode = packageInfo.versionCode;
-
-                    System.out.println("aaaaaaa " + info.getVersion_code());
-
-                    if (versionCode >= info.getVersion_code() && versionCode >= state.getNewVersionCode()){
-                        return;}
-
-                    state.setNewVersionCode(info.getVersion_code());
-                    state.setNewVersionName(info.getVersion());
-                    state.setHasNewVersion(true);
+        try {
+            PackageInfo packageInfo = getPackageManager().getPackageInfo(MainActivity.this.getPackageName(), 0);
+            int currentVersionCode = packageInfo.versionCode;
+            WebManager webManager = new WebManager();
+            webManager.checkHasNewVersion(state, AboutActivity.APP_INFO_URL, currentVersionCode, new WebManager.CheckNewVersionCallback() {
+                @Override
+                public void saveState() {
                     FileSystem.SaveState(MainActivity.this,state);
+                }
 
+                @Override
+                public void updateUI() {
                     getTheme().resolveAttribute(R.attr.colorOnPrimary, typedValue, true);
                     aboutBtn.setTextColor(typedValue.data);
                     aboutBtn.setBackgroundResource(R.drawable.ripple_button);
                     binding.menuBtn.setImageResource(R.drawable.menu_with_dot);
-
-                } catch (PackageManager.NameNotFoundException e) {
-                    throw new RuntimeException(e);
                 }
-            }
+            });
 
-            @Override
-            public void onFailure() {
-                System.out.println("Fail");
-            }
+        } catch (PackageManager.NameNotFoundException e) {
+            throw new RuntimeException(e);
+        }
 
-            @Override
-            public void onFailure(int code) {
-                System.out.println("Fail, code:" + code);
-            }
-        });
 
     }
 
