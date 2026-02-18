@@ -4,6 +4,9 @@ import java.util.ArrayList;
 
 public class ListItem {
 
+    public static final String ARRAY_NAME = "[...]";
+    public static final String ARRAY_ITEMS_NAME = "[...]";
+    public static final String ARRAY_OBJECTS_NAME = "[...]";
     private String Name;
     private String Value;
     private boolean isArray;
