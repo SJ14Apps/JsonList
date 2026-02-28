@@ -5,8 +5,13 @@ import java.util.Stack;
 
 public class JsonData {
     String path = "";
+    @Deprecated
     ArrayList<ListItem> rootList = new ArrayList<>();
+    @Deprecated
     ArrayList<ListItem> currentList = new ArrayList<>();
+
+    JsonNode rootNode;
+    JsonNode currentNode;
     Stack<Integer> previousPosStack = new Stack<>();
     String rawData = "";
     String fileName;
@@ -23,19 +28,35 @@ public class JsonData {
         this.path = path;
     }
 
+
+    @Deprecated
     public ArrayList<ListItem> getRootList() {
         return rootList;
     }
-
+    @Deprecated
     public void setRootList(ArrayList<ListItem> rootList) {
         this.rootList = rootList;
     }
-
+    @Deprecated
     public ArrayList<ListItem> getCurrentList() {
         return currentList;
     }
-
+    @Deprecated
     public void setCurrentList(ArrayList<ListItem> currentList) {
+        this.currentList = currentList;
+    }
+
+
+    public JsonNode getRootNode() {
+        return rootNode;
+    }
+    public void setRootNode(JsonNode rootNode) {
+        this.rootNode = rootNode;
+    }
+    public JsonNode getCurrentNode() {
+        return currentNode;
+    }
+    public void setCurrentNode(ArrayList<ListItem> currentList) {
         this.currentList = currentList;
     }
 
@@ -69,8 +90,8 @@ public class JsonData {
         return path.split("///");
     }
 
-    public boolean isRootListNull(){
-        return rootList == null;
+    public boolean isRootNodeNull(){
+        return rootNode == null;
     }
 
     public void goBack(){
