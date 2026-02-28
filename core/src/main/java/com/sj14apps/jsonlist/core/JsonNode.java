@@ -13,7 +13,7 @@ public class JsonNode {
     public boolean isObject;
     public boolean isArray;
     public boolean isRoot;
-    public ArrayList<JsonNode> children = new ArrayList<>();
+    public ArrayList<JsonNode> children;
 
     public JsonNode createRoot() {
         isRoot = true;
@@ -22,11 +22,13 @@ public class JsonNode {
 
     public JsonNode object() {
         isObject = true;
+        children = new ArrayList<>();
         return this;
     }
 
     public JsonNode array() {
         isArray = true;
+        children = new ArrayList<>();
         return this;
     }
 
@@ -57,14 +59,6 @@ public class JsonNode {
 
     public void setId(Integer id) {
         this.id = id;
-    }
-
-    public void setIsObject(boolean object) {
-        isObject = object;
-    }
-
-    public void setIsArray(boolean array) {
-        isArray = array;
     }
 
     public void setIsRoot(boolean root) {

@@ -16,9 +16,8 @@ import java.util.Set;
 public class JsonFunctions {
 
     public static JsonNode getJsonArrayRoot(JsonArray array) {
-        JsonNode mainNode = new JsonNode();
+        JsonNode mainNode = new JsonNode().array();
         setArrayName(array,mainNode);
-        mainNode.setIsArray(true);
         mainNode.setChildren(getJsonArray(array));
         return mainNode;
     }
@@ -114,8 +113,7 @@ public class JsonFunctions {
         }
         if (obj.get(o.toString()) instanceof JsonArray) {
             JsonArray array = (JsonArray) obj.get(o.toString());
-            JsonNode item = new JsonNode();
-            item.setIsArray(true);
+            JsonNode item = new JsonNode().array();
             item.setChildren(getJsonArray(array));
             return item;
         }
