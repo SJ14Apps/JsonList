@@ -1,0 +1,9 @@
+Bugfix
+- Fixed app not showing in "Open with..." dialog on some file explorers
+
+New
+- Automatically check for update and notify in the app if it has new version
+
+Updates
+- UI update for list item for object or array
+- Update display name of array
