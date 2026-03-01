@@ -91,16 +91,16 @@ public class JsonFunctions {
 
     private static void setArrayName(JsonArray array, ListItem item){
         if(isArrayOfObjects(array)) {
-            item.setName("Objects Array");
+            item.setName(ListItem.ARRAY_OBJECTS_NAME);
             item.setIsRootItem(true);
             return;
         }
         if (isArrayOfArray(array)){
-            item.setName("Array");
+            item.setName(ListItem.ARRAY_NAME);
             item.setIsRootItem(true);
             return;
         }
-        item.setName("Array items");
+        item.setName(ListItem.ARRAY_ITEMS_NAME);
         item.setIsRootItem(true);
     }
     private static String getStringFromJson(String value){
@@ -200,9 +200,9 @@ public class JsonFunctions {
 
         if (rootList.size() == 1 && rootList.get(0).isArray() &&
                 (
-                        rootList.get(0).getName().equals("Array items") ||
-                                rootList.get(0).getName().equals("Objects Array") ||
-                                rootList.get(0).getName().equals("Array"))
+                        rootList.get(0).getName().equals(ListItem.ARRAY_ITEMS_NAME) ||
+                                rootList.get(0).getName().equals(ListItem.ARRAY_OBJECTS_NAME) ||
+                                rootList.get(0).getName().equals(ListItem.ARRAY_NAME))
         ) {
 
             rootElement = convertListItemToElement(rootList.get(0));

@@ -60,11 +60,39 @@
                 android:layout_width="80dp"
                 android:layout_height="80dp"
                 android:layout_centerHorizontal="true" />
+
+            <LinearLayout
+                android:id="@+id/newVersionAvailable"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/logo"
+                android:background="@drawable/background5"
+                android:layout_marginTop="10dp"
+                android:layout_marginHorizontal="10dp"
+                android:orientation="vertical"
+                android:visibility="gone"
+                >
+
+                <TextView
+                    android:id="@+id/newVersionAvailableTxt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingVertical="20dp"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:text="@string/new_version_available"
+                    android:layout_gravity="center"
+                    android:textAlignment="center"
+
+                    />
+
+            </LinearLayout>
+
             <RelativeLayout
                 android:id="@+id/list"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/logo"
+                android:layout_below="@+id/newVersionAvailable"
                 >
 
                 <androidx.recyclerview.widget.RecyclerView
@@ -109,7 +137,6 @@
                     />
 
             </RelativeLayout>
-
 
             <Button
                 android:id="@+id/updateBtn"

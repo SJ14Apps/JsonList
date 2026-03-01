@@ -27,5 +27,11 @@ public class App extends Application {
                 break;
         }
 
+        if (state.settingsVersion < 2){
+            state.setAutoCheckForUpdate(true);
+            state.settingsVersion = 2;
+            FileSystem.SaveState(this,state);
+        }
+
     }
 }

@@ -9,8 +9,8 @@ android {
         applicationId "com.sjapps.jsonlist"
         minSdk 23
         targetSdk 36
-        versionCode 900
-        versionName "1.9"
+        versionCode 1000
+        versionName "1.10"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.generatedDensities = []
@@ -58,6 +58,6 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.2.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.6.1'
 
-    implementation 'com.github.slavce14:sj-dialog:1.7'
+    implementation 'com.github.sj14apps:SJ-Dialog:1.7.0.1'
     implementation "androidx.core:core-splashscreen:1.0.1"
 }

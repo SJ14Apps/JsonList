@@ -298,34 +298,19 @@
                         app:tint="?colorOnPrimaryContainer"
 
                         android:src="@drawable/ic_search" />
-                    <RelativeLayout
+
+                    <ImageView
                         android:id="@+id/editBtn"
                         android:layout_width="60dp"
                         android:layout_height="40dp"
                         android:background="@drawable/ripple2"
-                        >
-                        <ImageView
-                            android:layout_width="25dp"
-                            android:layout_height="25dp"
-                            android:layout_centerHorizontal="true"
-                            android:layout_marginTop="4dp"
-                            app:tint="?colorOnPrimaryContainer"
-                            android:src="@drawable/ic_edit" >
-                        </ImageView>
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/beta"
-                            android:paddingHorizontal="10dp"
-                            android:background="@drawable/ripple_red"
-                            android:textColor="?colorOnError"
-                            android:textSize="8dp"
-                            android:layout_alignParentBottom="true"
-                            android:layout_marginBottom="3dp"
-                            android:layout_centerHorizontal="true"
-                            />
+                        app:tint="?colorOnPrimaryContainer"
+                        android:padding="5dp"
 
-                    </RelativeLayout>
+                        android:src="@drawable/ic_edit"
+                        />
+
+
                     <ImageButton
                         android:id="@+id/filterBtn"
                         android:layout_width="60dp"

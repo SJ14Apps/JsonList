@@ -39,7 +39,7 @@ public class AndroidFileManager implements FileManager {
             Snackbar.make(activity.getWindow().getDecorView(), R.string.loading_file_in_progress, BaseTransientBottomBar.LENGTH_SHORT).show();
             return;
         }
-        if (activity.isEditMode){
+        if (activity.editController.isEditMode){
             Snackbar.make(activity.getWindow().getDecorView(), R.string.editing_in_progress, BaseTransientBottomBar.LENGTH_SHORT).show();
             return;
         }

@@ -104,16 +104,13 @@ public class AndroidDragAndDrop {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N)
             dropPermissions = activity.requestDragAndDropPermissions(event);
 
-        callback.onDrop(item.getUri());
-
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N && dropPermissions != null)
-            dropPermissions.release();
+        callback.onDrop(item.getUri(), dropPermissions);
         return true;
     }
 
     public interface DragAndDropCallback {
         boolean checkIfFileIsLoading();
-        void onDrop(Uri uri);
+        void onDrop(Uri uri, DragAndDropPermissions permissions);
     }
 
 

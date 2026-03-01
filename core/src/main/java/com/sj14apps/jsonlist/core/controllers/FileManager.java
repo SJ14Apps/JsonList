@@ -17,6 +17,10 @@ public interface FileManager {
         void onProgressUpdate(int progress);
     }
 
+    interface FileReadingCallback {
+        void onFileReadingFinished();
+    }
+
     interface FileWriteCallback {
         void onFileWriteSuccess();
         void onFileWriteFail();

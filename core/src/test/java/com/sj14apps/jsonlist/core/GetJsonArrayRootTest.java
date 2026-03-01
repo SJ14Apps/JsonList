@@ -25,7 +25,7 @@ public class GetJsonArrayRootTest {
         ArrayList<ListItem> expectedArr = new ArrayList<>();
 
         ListItem root = new ListItem();
-        root.setName("Objects Array");
+        root.setName(ListItem.ARRAY_OBJECTS_NAME);
         root.setIsArray(true);
 
         ArrayList<ListItem> listItems = new ArrayList<>();
@@ -56,7 +56,7 @@ public class GetJsonArrayRootTest {
         ArrayList<ListItem> expectedArr = new ArrayList<>();
 
         ListItem root = new ListItem();
-        root.setName("Array items");
+        root.setName(ListItem.ARRAY_ITEMS_NAME);
         root.setIsArray(true);
 
         ArrayList<ArrayList<ListItem>> arrayListArrayList = new ArrayList<>();
@@ -100,7 +100,7 @@ public class GetJsonArrayRootTest {
         ArrayList<ListItem> result = JsonFunctions.getJsonArrayRoot(jsonArray);
         assertNotNull(result);
         assertEquals(1, result.size());
-        assertEquals("Objects Array", result.get(0).getName());
+        assertEquals(ListItem.ARRAY_OBJECTS_NAME, result.get(0).getName());
         assertTrue(result.get(0).isArray());
         assertEquals(0, result.get(0).getListObjects().size());
     }

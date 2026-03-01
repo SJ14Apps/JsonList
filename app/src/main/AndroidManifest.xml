@@ -40,17 +40,11 @@
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
-
                 <category android:name="android.intent.category.DEFAULT" />
 
-                <data android:host="*" />
-                <data android:mimeType="application/json" />
-                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.json" />
-                <data android:pathPattern=".*\\..*\\..*\\..*\\.json" />
-                <data android:pathPattern=".*\\..*\\..*\\.json" />
-                <data android:pathPattern=".*\\..*\\.json" />
-                <data android:pathPattern=".*\\.json" />
                 <data android:scheme="content" />
+                <data android:scheme="file" />
+                <data android:mimeType="application/json" />
             </intent-filter>
         </activity>
 

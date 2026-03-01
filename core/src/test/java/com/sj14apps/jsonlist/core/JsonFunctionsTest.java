@@ -22,7 +22,7 @@ public class JsonFunctionsTest {
         ArrayList<ListItem> result = JsonFunctions.getJsonArrayRoot(jsonArray);
         assertNotNull(result);
         assertEquals(1, result.size());
-        assertEquals("Objects Array", result.get(0).getName());
+        assertEquals(ListItem.ARRAY_OBJECTS_NAME, result.get(0).getName());
         assertTrue(result.get(0).isArray());
         assertEquals(1, result.get(0).getListObjects().size());
     }
