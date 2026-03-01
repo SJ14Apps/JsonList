@@ -31,7 +31,9 @@ public class JsonData {
 
     @Deprecated
     public ArrayList<ListItem> getRootList() {
-        return rootList;
+        if (rootNode.isObject)
+            return JsonFunctions.getObject(rootNode);
+        return JsonFunctions.getArrayList(rootNode.children);
     }
     @Deprecated
     public void setRootList(ArrayList<ListItem> rootList) {
@@ -39,7 +41,13 @@ public class JsonData {
     }
     @Deprecated
     public ArrayList<ListItem> getCurrentList() {
-        return currentList;
+        if (currentNode.isObject)
+            return JsonFunctions.getObject(currentNode);
+        if (currentNode.isArray)
+            return JsonFunctions.getArrayList(currentNode.children);
+        ArrayList<ListItem> items = new ArrayList<>();
+        items.add(new ListItem().error());
+        return items;
     }
     @Deprecated
     public void setCurrentList(ArrayList<ListItem> currentList) {
@@ -56,8 +64,8 @@ public class JsonData {
     public JsonNode getCurrentNode() {
         return currentNode;
     }
-    public void setCurrentNode(ArrayList<ListItem> currentList) {
-        this.currentList = currentList;
+    public void setCurrentNode(JsonNode currentNode) {
+        this.currentNode = currentNode;
     }
 
 

@@ -4,57 +4,63 @@ import java.util.ArrayList;
 
 public class ListItem {
 
+    @Deprecated
     public static final String ARRAY_NAME = "[...]";
+    @Deprecated
     public static final String ARRAY_ITEMS_NAME = "[...]";
+    @Deprecated
     public static final String ARRAY_OBJECTS_NAME = "[...]";
-    private String Name;
-    private String Value;
-    private boolean isArray;
-    private boolean isObject;
+
     private boolean isSpace;
-    private boolean isRootItem;
-    private ArrayList<ListItem> Objects;
-    private ArrayList<ArrayList<ListItem>> ListObjects;
-    private int id = -1;
+    @Deprecated
     private int position = -1;
+    @Deprecated
     private ArrayList<ListItem> parentList;
+
+    JsonNode jsonNode;
 
 
     public ListItem(){
     }
 
+    public ListItem(JsonNode node){
+        this.jsonNode = node;
+    }
+
 
     public String getName() {
-        return Name;
+        return jsonNode.key;
     }
 
     public void setName(String name) {
-        if (!isRootItem)
-            Name = name;
+        if (!jsonNode.isRoot)
+            jsonNode.setKey(name);
     }
 
     public String getValue() {
-        return Value;
+        return jsonNode.value;
     }
 
     public void setValue(String value) {
-        Value = value;
+        jsonNode.setValue(value);
     }
 
     public boolean isArray() {
-        return isArray;
+        return jsonNode.isArray;
     }
 
+    @Deprecated
     public void setIsArray(boolean array) {
-        isArray = array;
+        jsonNode.isArray = array;
     }
 
     public boolean isObject() {
-        return isObject;
+        return jsonNode.isObject;
     }
 
+    @Deprecated
     public void setIsObject(boolean object) {
-        isObject = object;
+        jsonNode.isObject = object;
     }
 
     public boolean isSpace() {
@@ -62,11 +68,12 @@ public class ListItem {
     }
 
     public boolean isRootItem() {
-        return isRootItem;
+        return jsonNode.isRoot;
     }
 
+    @Deprecated
     public void setIsRootItem(boolean b) {
-        isRootItem = b;
+        jsonNode.isRoot = b;
     }
 
     public void setIsSpace(boolean space) {
@@ -74,27 +81,35 @@ public class ListItem {
     }
 
     public ArrayList<ListItem> getObjects() {
-        return Objects;
+        if (!jsonNode.isObject) return null;
+
+        ArrayList<ListItem> listItems = new ArrayList<>();
+        for (JsonNode node: jsonNode.children) {
+            ListItem item = new ListItem(node);
+            listItems.add(item);
+        }
+
+        return listItems;
     }
 
+    @Deprecated
     public void setObjects(ArrayList<ListItem> objects) {
-        Objects = objects;
     }
 
     public ArrayList<ArrayList<ListItem>> getListObjects() {
-        return ListObjects;
+        return null;
     }
 
     public void setListObjects(ArrayList<ArrayList<ListItem>> listObjects) {
-        ListObjects = listObjects;
+
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setJsonNode(JsonNode jsonNode){
+        this.jsonNode = jsonNode;
     }
 
     public int getId() {
-        return id;
+        return jsonNode == null? -1: jsonNode.id == null? -1: jsonNode.id;
     }
 
     public int getPosition() {
@@ -116,15 +131,10 @@ public class ListItem {
     @Override
     public String toString() {
         return "{" +
-                "\"ID\":" + id +
                 ",\"Position\":" + position +
-                ",\"Name\":" +(Name!=null && !Name.startsWith("\"")?"\"":"") +  Name + (Name!=null && !Name.startsWith("\"")?"\"":"") +
-                ", \"Value\":" + (Value!=null && !Value.startsWith("\"")?"\"":"") + Value + (Value!=null && !Value.startsWith("\"")?"\"":"") +
-                ", \"isArray\":" + isArray +
-                ", \"isObject\":" + isObject +
                 ", \"isSpace\":" + isSpace +
-                ", \"Objects\":" + Objects +
-                ", \"ListObjects\":" + ListObjects +
+                ", \"node\":" + jsonNode +
+
                 '}';
     }
 
@@ -135,14 +145,20 @@ public class ListItem {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof ListItem)) return false;
-        ListItem item = (ListItem) o;
-        return isArray() == item.isArray() && isObject() == item.isObject() && isSpace() == item.isSpace() && java.util.Objects.equals(getName(), item.getName()) && java.util.Objects.equals(getValue(), item.getValue()) && java.util.Objects.equals(getObjects(), item.getObjects()) && java.util.Objects.equals(getListObjects(), item.getListObjects());
+        //TODO regenerate this
+        return false;
     }
 
     @Override
     public int hashCode() {
-        return java.util.Objects.hash(getName(), getValue(), isArray(), isObject(), isSpace(), getObjects(), getListObjects());
+        //TODO regenerate this
+        return 0;
+    }
+
+    public ListItem error() {
+        JsonNode node = new JsonNode();
+        node.setKey("ERROR");
+        node.setValue("This was not supposed to happen!!");
+        return new ListItem(node);
     }
 }

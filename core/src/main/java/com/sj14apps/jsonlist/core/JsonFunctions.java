@@ -122,31 +122,45 @@ public class JsonFunctions {
         return item;
     }
 
-    @Deprecated
-    static ArrayList<ListItem> getArrayList(ArrayList<ArrayList<ListItem>> list) {
+    static ArrayList<ListItem> getArrayList(ArrayList<JsonNode> list) {
         ArrayList<ListItem> newList = new ArrayList<>();
         ListItem space = new ListItem().Space();
         for (int i = 0; i < list.size(); i++) {
-            setId(list.get(i), i);
-            newList.addAll(list.get(i));
+            if (list.get(i).children == null){
+                newList.add(new ListItem(list.get(i)));
+                continue;
+            }
+            for (JsonNode node : list.get(i).children) {
+                newList.add(new ListItem(node));
+            }
             newList.add(space);
         }
         return newList;
     }
 
-    private static void setId(ArrayList<ListItem> lists, int id) {
+    static ArrayList<ListItem> getObject(JsonNode obj){
+        ArrayList<ListItem> items = new ArrayList<>();
 
-        for (ListItem listItem : lists) {
-            listItem.setId(id);
+        for (JsonNode node : obj.children){
+            items.add(new ListItem(node));
         }
+
+        return items;
     }
 
-    public static ArrayList<ListItem> getListFromPath(String path, ArrayList<ListItem> rootList) {
+    private static void setId(ArrayList<ListItem> lists, int id) {
+
+//        for (ListItem listItem : lists) {
+//            listItem.setId(id);
+//        }
+    }
+
+    public static ArrayList<ListItem> getListFromPath(String path, JsonNode rootNode) {
 
 
         String[] pathStrings = path.split("///");
 
-        ArrayList<ListItem> list = rootList;
+        ArrayList<JsonNode> list = rootNode.children;
 
         for (String pathString : pathStrings) {
 
@@ -157,27 +171,25 @@ public class JsonFunctions {
             }
 
             for (int i = 0; i < list.size(); i++){
-                ListItem item = list.get(i);
+                JsonNode item = list.get(i);
 
-                if (item.getName() == null || !item.getName().equals(id != -1 ? pathString.substring(pathString.indexOf("}") + 1) : pathString))
+                if (item.key == null || !item.key.equals(id != -1 ? pathString.substring(pathString.indexOf("}") + 1) : pathString))
                     continue;
 
-                if (id != -1 && item.getId() != id)
+                if (id != -1 && item.id != id)
                     continue;
 
-                if (item.isArray()) {
-                    list = getArrayList(item.getListObjects());
-                    break;
+                if (item.isArray) {
+                    return getArrayList(item.children);
                 }
-                list = list.get(i).getObjects();
-                if (list == null)
-                    list = new ArrayList<>();
-                break;
+                return getObject(item);
             }
         }
-        return list;
+        return new ArrayList<>();
 
     }
+
+
 
     public static String getAsPrettyPrint(String data){
         JsonElement json = JsonParser.parseString(data);

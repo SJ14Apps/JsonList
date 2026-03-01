@@ -298,6 +298,10 @@ public class MainActivity extends AppCompatActivity {
         });
         binding.dimLayout.setOnClickListener(view -> open_closeMenu());
         binding.splitViewBtn.setOnClickListener(view -> rawJsonView.toggleSplitView());
+        binding.splitViewBtn.setOnLongClickListener(view -> {
+            ((AndroidRawJsonView) rawJsonView).ShowDebugJson();
+            return true;
+        });
         binding.filterBtn.setOnClickListener(view -> filter());
         binding.searchBtn.setOnClickListener(view -> searchController.showSearchView());
         binding.editBtn.setOnClickListener(view -> editController.toggleEdit());
@@ -694,7 +698,7 @@ public class MainActivity extends AppCompatActivity {
         binding.pathList.setAdapter(pathAdapter);
         data.setPath(path);
         binding.titleTxt.setText(Title);
-        ArrayList<ListItem> arrayList = getListFromPath(path,data.getRootList());
+        ArrayList<ListItem> arrayList = getListFromPath(path,data.getRootNode());
         data.setCurrentList(arrayList);
         updateFilterList(arrayList);
         adapter = new ListAdapter(arrayList, this, path);
@@ -1100,9 +1104,9 @@ public class MainActivity extends AppCompatActivity {
                 if (binding.searchLL.getVisibility() == VISIBLE)
                     searchController.hideSearchView();
 
-                data.setCurrentList(data.getRootList());
-                updateFilterList(data.getRootList());
-                adapter = new ListAdapter(data.getRootList(), MainActivity.this, "");
+                data.setCurrentNode(data.getRootNode());
+                updateFilterList(data.getRootList()); //TODO
+                adapter = new ListAdapter(data.getCurrentList(), MainActivity.this, "");
                 pathAdapter = new PathListAdapter(MainActivity.this,data.getPath());
                 binding.list.setAdapter(adapter);
                 binding.pathList.setAdapter(pathAdapter);

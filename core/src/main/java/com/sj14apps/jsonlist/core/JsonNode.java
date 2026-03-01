@@ -1,6 +1,7 @@
 package com.sj14apps.jsonlist.core;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class JsonNode {
     public static final String ARRAY_NAME = "[...]";
@@ -36,12 +37,21 @@ public class JsonNode {
     public String toString() {
         return "{" +
                 "\"id\":" + id +
-                ",\"key\":" + (key!=null && !key.startsWith("\"")?"\"":"") +  key + (key!=null && !key.startsWith("\"")?"\"":"") +
-                ",\"value\":" + (value!=null && !value.startsWith("\"")?"\"":"") + value + (value!=null && !value.startsWith("\"")?"\"":"") +
+                "," + getKeyToString() +
+                "," + getValueToString() +
                 ",\"isObject\":" + isObject +
                 ",\"isArray\":" + isArray +
                 ",\"children\":" + children +
+                ",\"parent\": " + (parent== null? null: "{ \"id\":" + parent.id + "," + parent.getKeyToString() + "}") +
                 '}';
+    }
+
+    public String getKeyToString(){
+        return "\"key\":" + (key!=null && !key.startsWith("\"")?"\"":"") +  key + (key!=null && !key.startsWith("\"")?"\"":"");
+    }
+
+    public String getValueToString(){
+        return "\"value\":" + (value!=null && !value.startsWith("\"")?"\"":"") + value + (value!=null && !value.startsWith("\"")?"\"":"");
     }
 
 
@@ -69,5 +79,15 @@ public class JsonNode {
         this.children = children;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        JsonNode jsonNode = (JsonNode) o;
+        return isObject == jsonNode.isObject && isArray == jsonNode.isArray && isRoot == jsonNode.isRoot && Objects.equals(key, jsonNode.key) && Objects.equals(value, jsonNode.value) && Objects.equals(id, jsonNode.id) && Objects.equals(children, jsonNode.children);
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(key, value, id, isObject, isArray, isRoot, children);
+    }
 }

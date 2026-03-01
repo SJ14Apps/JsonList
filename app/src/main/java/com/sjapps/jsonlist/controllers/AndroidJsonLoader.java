@@ -86,7 +86,6 @@ public class AndroidJsonLoader implements JsonLoader {
                 fileNotLoadedException();
                 return;
             }
-
             callBack.after();
 
         });
