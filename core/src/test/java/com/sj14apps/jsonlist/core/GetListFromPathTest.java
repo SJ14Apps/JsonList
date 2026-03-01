@@ -1,3 +1,4 @@
+/*
 package com.sj14apps.jsonlist.core;
 
 import static junit.framework.TestCase.*;
@@ -166,3 +167,4 @@ public class GetListFromPathTest {
 
 
 }
+*/

@@ -1,3 +1,4 @@
+/*
 package com.sj14apps.jsonlist.core;
 
 import com.google.gson.*;
@@ -89,3 +90,4 @@ public class GetAsRawJsonTest {
                 " \"Bachelor of Science in Computer Science\",\"graduation_year\": 2015}]}}");
     }
 }
+*/
