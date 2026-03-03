@@ -29,6 +29,13 @@ public class functions {
         return dateFormat.format(c.getTime());
     }
 
+    public static String timeFormatShort(Long d){
+        if (d == null)
+            return "N/A";
+        SimpleDateFormat dateFormat = new SimpleDateFormat("d MMM yyyy");
+        return dateFormat.format(d);
+    }
+
     public static void setAnimation(Context context, @NonNull View view, @AnimRes int animationRes) {
         setAnimation(context,view,animationRes,null);
     }

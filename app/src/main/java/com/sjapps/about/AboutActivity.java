@@ -44,6 +44,7 @@ import com.sjapps.jsonlist.FileSystem;
 import com.sjapps.jsonlist.R;
 import com.sjapps.jsonlist.databinding.ActivityAboutBinding;
 import com.sjapps.jsonlist.databinding.FeedbackDialogBinding;
+import com.sjapps.jsonlist.functions;
 import com.sjapps.library.customdialog.BasicDialog;
 import com.sjapps.library.customdialog.CustomViewDialog;
 import com.sjapps.library.customdialog.DialogButtonEvents;
@@ -384,6 +385,8 @@ public class AboutActivity extends AppCompatActivity {
                 StringBuilder stringBuilder = new StringBuilder();
                 for (ReleaseNote note : releasesHistory) {
                     stringBuilder.append("<h3>").append(note.title).append("</h3>");
+                    if (note.timestamp != null)
+                        stringBuilder.append("<h4>").append(functions.timeFormatShort(note.timestamp)).append("</h4>");
                     stringBuilder.append(note.changelog.replaceAll("\n", "<br>")).append("<br>");
                     stringBuilder.append("<br><br>");
                 }
