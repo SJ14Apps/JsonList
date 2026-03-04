@@ -36,7 +36,7 @@ android {
             signingConfig signingConfigs.debug
         }
         debug {
-            applicationIdSuffix '.debug'
+            applicationIdSuffix '.v2.debug'
             versionNameSuffix ' dev'
         }
     }
