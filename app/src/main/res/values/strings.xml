@@ -26,6 +26,7 @@
     <string name="version">Version</string>
     <string name="open_source_libraries">Open source libraries</string>
     <string name="check_for_update">Check for update</string>
+    <string name="select_version">Select version</string>
 
     <!--  Sending Feedback  -->
     <string name="send_feedback">Send Feedback</string>
@@ -43,6 +44,7 @@
     <string name="auto_check_for_update">Automatically check for update</string>
     <string name="auto_check_for_update_description">check if there is a new version and notify in the app</string>
     <string name="beta">Beta</string>
+    <string name="stable">Stable</string>
 
     <!--  Crash logs Page -->
     <string name="crash_logs">Crash logs</string>

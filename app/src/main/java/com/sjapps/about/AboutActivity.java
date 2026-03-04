@@ -40,6 +40,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.sj14apps.jsonlist.core.AppState;
 import com.sj14apps.jsonlist.core.controllers.WebManager;
+import com.sjapps.jsonlist.BuildConfig;
 import com.sjapps.jsonlist.FileSystem;
 import com.sjapps.jsonlist.R;
 import com.sjapps.jsonlist.databinding.ActivityAboutBinding;
@@ -51,6 +52,7 @@ import com.sjapps.library.customdialog.DialogButtonEvents;
 import com.sjapps.library.customdialog.ImageListItem;
 import com.sjapps.library.customdialog.ListDialog;
 import com.sjapps.library.customdialog.SJDialog;
+import com.sjapps.library.customdialog.list.events.ListItemClick;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -335,7 +337,7 @@ public class AboutActivity extends AppCompatActivity {
         return s;
     }
 
-    public void ShowReleasesNotes(View view) {
+    public void ShowReleasesNotes(String url){
         if (releaseNotesOpen)
             return;
 
@@ -345,7 +347,7 @@ public class AboutActivity extends AppCompatActivity {
         TextView textView = new TextView(AboutActivity.this);
 
         WebManager webManager = new WebManager();
-        webManager.getFromUrl(RELEASE_NOTES_URL, new WebManager.WebCallback() {
+        webManager.getFromUrl(url, new WebManager.WebCallback() {
             @Override
             public void onStarted() {
                 textView.setText(R.string.loading);
@@ -416,6 +418,27 @@ public class AboutActivity extends AppCompatActivity {
                 });
             }
         });
+    }
+
+    public void ShowReleasesNotes(View view) {
+
+        if (!BuildConfig.IS_BETA){
+            ShowReleasesNotes(RELEASE_NOTES_URL);
+            return;
+        }
+
+        ListDialog dialog = new ListDialog();
+        String[] items = new String[]{getString(R.string.stable),getString(R.string.beta)};
+        dialog.Builder(this,true)
+                .setTitle(getString(R.string.select_version))
+                .setItems(items, (i, s) -> {
+                    switch (i){
+                        case 0: ShowReleasesNotes(RELEASE_NOTES_URL);
+                        case 1: ShowReleasesNotes(RELEASE_NOTES_URL + "-beta");
+                    }
+                    dialog.dismiss();
+                })
+                .show();
     }
 
     public void Back(View view) {
