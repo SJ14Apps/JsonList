@@ -46,6 +46,8 @@ public class ListItem {
     }
 
     public boolean isArray() {
+        if (jsonNode == null)
+            return false;
         return jsonNode.isArray;
     }
 
@@ -55,6 +57,8 @@ public class ListItem {
     }
 
     public boolean isObject() {
+        if (jsonNode == null)
+            return false;
         return jsonNode.isObject;
     }
 
@@ -104,6 +108,9 @@ public class ListItem {
 
     }
 
+    public JsonNode getJsonNode(){
+        return this.jsonNode;
+    }
     public void setJsonNode(JsonNode jsonNode){
         this.jsonNode = jsonNode;
     }

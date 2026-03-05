@@ -41,6 +41,7 @@ public class JsonData {
     }
     @Deprecated
     public ArrayList<ListItem> getCurrentList() {
+//        System.out.println("Current node: " + currentNode);
         if (currentNode.isObject)
             return JsonFunctions.getObject(currentNode);
         if (currentNode.isArray)
@@ -86,7 +87,7 @@ public class JsonData {
     }
 
     public boolean isEmptyPath(){
-        return path.equals("");
+        return currentNode.equals(rootNode); //TODO
     }
     public void clearPath(){
         path = "";

@@ -18,26 +18,28 @@ public class JsonFunctions {
     public static JsonNode getJsonArrayRoot(JsonArray array) {
         JsonNode mainNode = new JsonNode().array();
         setArrayName(array,mainNode);
-        mainNode.setChildren(getJsonArray(array));
+        mainNode.setChildren(getJsonArray(mainNode,array));
         return mainNode;
     }
 
-    public static ArrayList<JsonNode> getJsonArray(JsonArray array) {
+    public static ArrayList<JsonNode> getJsonArray(JsonNode parentNode, JsonArray array) {
         ArrayList<JsonNode> ArrList = new ArrayList<>();
         for (int i = 0; i < array.size(); i++) {
             if (array.get(i) instanceof JsonObject) {
                 JsonNode jsonNodeObj = getJsonObject((JsonObject) array.get(i));
                 jsonNodeObj.setId(i);
+                jsonNodeObj.setParent(parentNode);
                 ArrList.add(jsonNodeObj);
                 continue;
             }
             if (array.get(i) instanceof JsonArray){
                 JsonNode jsonNodeArr = new JsonNode().array();
 
-                ArrayList<JsonNode> ListOfItems = getJsonArray((JsonArray) array.get(i));
+                ArrayList<JsonNode> ListOfItems = getJsonArray(jsonNodeArr,(JsonArray) array.get(i));
                 jsonNodeArr.setChildren(ListOfItems);
                 setArrayName((JsonArray) array.get(i),jsonNodeArr);
                 jsonNodeArr.setId(i);
+                jsonNodeArr.setParent(parentNode);
                 ArrList.add(jsonNodeArr);
                 continue;
             }
@@ -114,7 +116,7 @@ public class JsonFunctions {
         if (obj.get(o.toString()) instanceof JsonArray) {
             JsonArray array = (JsonArray) obj.get(o.toString());
             JsonNode item = new JsonNode().array();
-            item.setChildren(getJsonArray(array));
+            item.setChildren(getJsonArray(null,array));
             return item;
         }
         JsonNode item = new JsonNode();
@@ -126,7 +128,7 @@ public class JsonFunctions {
         ArrayList<ListItem> newList = new ArrayList<>();
         ListItem space = new ListItem().Space();
         for (int i = 0; i < list.size(); i++) {
-            if (list.get(i).children == null){
+            if (!list.get(i).isObject){
                 newList.add(new ListItem(list.get(i)));
                 continue;
             }
@@ -187,6 +189,13 @@ public class JsonFunctions {
         }
         return new ArrayList<>();
 
+    }
+
+    public static ArrayList<ListItem> getListFromNode(JsonNode node){
+        if (node.isArray) {
+            return getArrayList(node.children);
+        }
+        return getObject(node);
     }
 
 

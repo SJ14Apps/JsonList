@@ -75,7 +75,6 @@ public class AndroidJsonLoader implements JsonLoader {
             }
 
             if (!data.isRootNodeNull()) {
-                System.out.println("Data: " + data.getRootNode());
                 callBack.success();
 
             } else {
