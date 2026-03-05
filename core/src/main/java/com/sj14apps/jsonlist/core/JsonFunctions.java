@@ -26,7 +26,7 @@ public class JsonFunctions {
         ArrayList<JsonNode> ArrList = new ArrayList<>();
         for (int i = 0; i < array.size(); i++) {
             if (array.get(i) instanceof JsonObject) {
-                JsonNode jsonNodeObj = getJsonObject((JsonObject) array.get(i));
+                JsonNode jsonNodeObj = getJsonObject(parentNode, (JsonObject) array.get(i));
                 jsonNodeObj.setId(i);
                 jsonNodeObj.setParent(parentNode);
                 ArrList.add(jsonNodeObj);
@@ -46,6 +46,7 @@ public class JsonFunctions {
             JsonNode item = new JsonNode();
             item.setValue(getStringFromJson(array.get(i).toString()));
             item.setId(i);
+            item.setParent(parentNode);
             ArrList.add(item);
         }
         return ArrList;
@@ -69,7 +70,7 @@ public class JsonFunctions {
         return true;
     }
 
-    public static JsonNode getJsonObject(JsonObject obj) {
+    public static JsonNode getJsonObject(JsonNode parentNode, JsonObject obj) {
         JsonNode mainNode = new JsonNode().object();
         Set<String> keys = obj.keySet();
         Object[] keysArray = keys.toArray();
@@ -77,7 +78,8 @@ public class JsonFunctions {
         for (Object o : keysArray) {
             JsonNode item = setItem(obj,o);
             item.setKey(o.toString());
-            item.setParent(mainNode);
+            // set the array node as parent instead of object
+            item.setParent(parentNode!= null? parentNode: mainNode);
             mainNode.children.add(item);
         }
         return mainNode;
@@ -111,12 +113,12 @@ public class JsonFunctions {
 
     private static JsonNode setItem(JsonObject obj, Object o){
         if (obj.get(o.toString()) instanceof JsonObject) {
-            return getJsonObject((JsonObject) obj.get(o.toString()));
+            return getJsonObject(null,(JsonObject) obj.get(o.toString()));
         }
         if (obj.get(o.toString()) instanceof JsonArray) {
             JsonArray array = (JsonArray) obj.get(o.toString());
             JsonNode item = new JsonNode().array();
-            item.setChildren(getJsonArray(null,array));
+            item.setChildren(getJsonArray(item,array));
             return item;
         }
         JsonNode item = new JsonNode();
