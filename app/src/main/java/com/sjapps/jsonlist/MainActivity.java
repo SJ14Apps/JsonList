@@ -250,9 +250,7 @@ public class MainActivity extends AppCompatActivity {
             if(canCallBackDispatcher()) getOnBackPressedDispatcher().onBackPressed();
         });
         binding.openFileBtn.setOnClickListener(view -> fileManager.importFromFile());
-        binding.openUrlBtn.setOnClickListener(view -> {
-            showUrlSearchView();
-        });
+        binding.openUrlBtn.setOnClickListener(view -> showUrlSearchView());
 
         binding.titleTxt.setOnClickListener(v -> {
             if (!data.isEmptyPath())
@@ -437,8 +435,6 @@ public class MainActivity extends AppCompatActivity {
             TransitionManager.endTransitions(binding.content);
             TransitionManager.beginDelayedTransition(binding.content, autoTransition);
             data.goBack();
-            System.out.println("go back-------------------");
-//            System.out.println(data.getCurrentNode());
             open(JsonData.getPathFormat(data.getPath()), data.getCurrentNode().parent,-1);
         }
     };
@@ -685,6 +681,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    //TODO replace it with open(Title, node, previousPosition)??
     public void open(String Title, String path, int previousPosition) {
         TransitionManager.endTransitions(binding.content);
         TransitionManager.beginDelayedTransition(binding.content, autoTransition);
@@ -701,8 +698,7 @@ public class MainActivity extends AppCompatActivity {
         binding.pathList.setAdapter(pathAdapter);
         data.setPath(path);
         binding.titleTxt.setText(Title);
-        ArrayList<ListItem> arrayList = getListFromPath(path,data.getRootNode());
-//        System.out.println(arrayList);
+        ArrayList<ListItem> arrayList = getListFromNode(data.getRootNode());
         data.setCurrentNode(data.getRootNode());
         updateFilterList(arrayList);
         adapter = new ListAdapter(arrayList, this, path);
@@ -746,11 +742,7 @@ public class MainActivity extends AppCompatActivity {
         data.setPath(path);
         binding.titleTxt.setText(Title); //TODO
 
-        System.out.println("open---------------------------");
-//        System.out.println(node);
         ArrayList<ListItem> arrayList = getListFromNode(node);
-//        System.out.println(arrayList);
-        System.out.println("-------------------------------");
         data.setCurrentNode(node);
         updateFilterList(arrayList);
         adapter = new ListAdapter(arrayList, this, path);
@@ -762,9 +754,7 @@ public class MainActivity extends AppCompatActivity {
                 else binding.list.scrollToPosition(data.getPreviousPos()+2);
                 adapter.setHighlightItem(data.getPreviousPos());
             }, 500);
-            handler.postDelayed(() -> {
-                adapter.notifyItemChanged(data.getPreviousPos());
-            }, 600);
+            handler.postDelayed(() -> adapter.notifyItemChanged(data.getPreviousPos()), 600);
         }
         else data.addPreviousPos(previousPosition);
 

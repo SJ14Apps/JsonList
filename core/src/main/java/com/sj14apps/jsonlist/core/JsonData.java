@@ -5,11 +5,6 @@ import java.util.Stack;
 
 public class JsonData {
     String path = "";
-    @Deprecated
-    ArrayList<ListItem> rootList = new ArrayList<>();
-    @Deprecated
-    ArrayList<ListItem> currentList = new ArrayList<>();
-
     JsonNode rootNode;
     JsonNode currentNode;
     Stack<Integer> previousPosStack = new Stack<>();
@@ -28,20 +23,12 @@ public class JsonData {
         this.path = path;
     }
 
-
-    @Deprecated
     public ArrayList<ListItem> getRootList() {
         if (rootNode.isObject)
             return JsonFunctions.getObject(rootNode);
         return JsonFunctions.getArrayList(rootNode.children);
     }
-    @Deprecated
-    public void setRootList(ArrayList<ListItem> rootList) {
-        this.rootList = rootList;
-    }
-    @Deprecated
     public ArrayList<ListItem> getCurrentList() {
-//        System.out.println("Current node: " + currentNode);
         if (currentNode.isObject)
             return JsonFunctions.getObject(currentNode);
         if (currentNode.isArray)
@@ -49,10 +36,6 @@ public class JsonData {
         ArrayList<ListItem> items = new ArrayList<>();
         items.add(new ListItem().error());
         return items;
-    }
-    @Deprecated
-    public void setCurrentList(ArrayList<ListItem> currentList) {
-        this.currentList = currentList;
     }
 
 

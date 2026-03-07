@@ -4,20 +4,11 @@ import java.util.ArrayList;
 
 public class ListItem {
 
-    @Deprecated
-    public static final String ARRAY_NAME = "[...]";
-    @Deprecated
-    public static final String ARRAY_ITEMS_NAME = "[...]";
-    @Deprecated
-    public static final String ARRAY_OBJECTS_NAME = "[...]";
-
+    JsonNode jsonNode;
     private boolean isSpace;
-    @Deprecated
     private int position = -1;
     @Deprecated
     private ArrayList<ListItem> parentList;
-
-    JsonNode jsonNode;
 
 
     public ListItem(){
@@ -96,16 +87,8 @@ public class ListItem {
         return listItems;
     }
 
-    @Deprecated
-    public void setObjects(ArrayList<ListItem> objects) {
-    }
-
     public ArrayList<ArrayList<ListItem>> getListObjects() {
         return null;
-    }
-
-    public void setListObjects(ArrayList<ArrayList<ListItem>> listObjects) {
-
     }
 
     public JsonNode getJsonNode(){
@@ -129,10 +112,6 @@ public class ListItem {
 
     public ArrayList<ListItem> getParentList() {
         return parentList;
-    }
-
-    public void setParentList(ArrayList<ListItem> parentList) {
-        this.parentList = parentList;
     }
 
     @Override

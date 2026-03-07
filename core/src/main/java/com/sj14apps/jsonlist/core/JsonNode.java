@@ -16,7 +16,7 @@ public class JsonNode {
     public boolean isRoot;
     public ArrayList<JsonNode> children;
 
-    public JsonNode createRoot() {
+    public JsonNode root() {
         isRoot = true;
         return this;
     }
@@ -41,6 +41,7 @@ public class JsonNode {
                 "," + getValueToString() +
                 ",\"isObject\":" + isObject +
                 ",\"isArray\":" + isArray +
+                ",\"isRoot\":" + isRoot +
                 ",\"children\":" + children +
                 ",\"parent\": " + (parent== null? null: "{ \"id\":" + parent.id + "," + parent.getKeyToString() + "}") +
                 '}';
@@ -69,10 +70,6 @@ public class JsonNode {
 
     public void setId(Integer id) {
         this.id = id;
-    }
-
-    public void setIsRoot(boolean root) {
-        isRoot = root;
     }
 
     public void setChildren(ArrayList<JsonNode> children) {

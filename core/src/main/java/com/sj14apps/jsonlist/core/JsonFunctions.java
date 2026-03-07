@@ -10,13 +10,12 @@ import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
 public class JsonFunctions {
 
     public static JsonNode getJsonArrayRoot(JsonArray array) {
-        JsonNode mainNode = new JsonNode().array();
+        JsonNode mainNode = new JsonNode().root().array();
         setArrayName(array,mainNode);
         mainNode.setChildren(getJsonArray(mainNode,array));
         return mainNode;
@@ -33,7 +32,7 @@ public class JsonFunctions {
                 continue;
             }
             if (array.get(i) instanceof JsonArray){
-                JsonNode jsonNodeArr = new JsonNode().array();
+                JsonNode jsonNodeArr = new JsonNode().root().array();
 
                 ArrayList<JsonNode> ListOfItems = getJsonArray(jsonNodeArr,(JsonArray) array.get(i));
                 jsonNodeArr.setChildren(ListOfItems);
@@ -88,16 +87,13 @@ public class JsonFunctions {
     private static void setArrayName(JsonArray array, JsonNode item){
         if(isArrayOfObjects(array)) {
             item.setKey(JsonNode.ARRAY_OBJECTS_NAME);
-            item.setIsRoot(true);
             return;
         }
         if (isArrayOfArray(array)){
             item.setKey(JsonNode.ARRAY_NAME);
-            item.setIsRoot(true);
             return;
         }
         item.setKey(JsonNode.ARRAY_ITEMS_NAME);
-        item.setIsRoot(true);
     }
     private static String getStringFromJson(String value){
         String ret = value.startsWith("\"") && value.endsWith("\"") ? value.substring(1,value.length()-1) : value;
@@ -152,13 +148,7 @@ public class JsonFunctions {
         return items;
     }
 
-    private static void setId(ArrayList<ListItem> lists, int id) {
-
-//        for (ListItem listItem : lists) {
-//            listItem.setId(id);
-//        }
-    }
-
+    // TODO No need for new. Rewrite it if needed
     public static ArrayList<ListItem> getListFromPath(String path, JsonNode rootNode) {
 
 
@@ -201,7 +191,6 @@ public class JsonFunctions {
     }
 
 
-
     public static String getAsPrettyPrint(String data){
         JsonElement json = JsonParser.parseString(data);
         Gson gson = new Gson().newBuilder().setPrettyPrinting().serializeNulls().create();
@@ -214,9 +203,9 @@ public class JsonFunctions {
 
         if (rootList.size() == 1 && rootList.get(0).isArray() &&
                 (
-                        rootList.get(0).getName().equals(ListItem.ARRAY_ITEMS_NAME) ||
-                                rootList.get(0).getName().equals(ListItem.ARRAY_OBJECTS_NAME) ||
-                                rootList.get(0).getName().equals(ListItem.ARRAY_NAME))
+                        rootList.get(0).getName().equals(JsonNode.ARRAY_ITEMS_NAME) ||
+                                rootList.get(0).getName().equals(JsonNode.ARRAY_OBJECTS_NAME) ||
+                                rootList.get(0).getName().equals(JsonNode.ARRAY_NAME))
         ) {
 
             rootElement = convertListItemToElement(rootList.get(0));
