@@ -141,7 +141,7 @@ public class AndroidEditController extends EditController {
                 isApplyingChanges = true;
                 new Thread(() -> {
                     if (!activity.data.getRawData().equals("-1"))
-                        activity.data.setRawData(JsonFunctions.convertToRawString(activity.data.getRootList()));
+                        activity.data.setRawData(JsonFunctions.convertToRawString(activity.data.getRootNode()));
                     activity.handler.post(()->{
                         activity.loadingFinished(true);
                         isEdited = false;

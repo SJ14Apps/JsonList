@@ -1004,7 +1004,7 @@ public class MainActivity extends AppCompatActivity {
             readFileThread = new Thread(() -> {
                 String dataStr = data.getRawData();
                 if (dataStr.equals("-1"))
-                    dataStr = JsonFunctions.convertToRawString(data.getRootList());
+                    dataStr = JsonFunctions.convertToRawString(data.getRootNode());
 
                 fileManager.writeFile(outputStream, dataStr, fileWriteCallback);
             });

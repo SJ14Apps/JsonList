@@ -198,63 +198,52 @@ public class JsonFunctions {
     }
 
 
-    public static String convertToRawString(ArrayList<ListItem> rootList) {
+    public static String convertToRawString(JsonNode rootNode) {
+        return convertToRawString(rootNode,true);
+    }
+    public static String convertToRawString(JsonNode rootNode, boolean prettyPrint) {
         JsonElement rootElement;
-
-        if (rootList.size() == 1 && rootList.get(0).isArray() &&
-                (
-                        rootList.get(0).getName().equals(JsonNode.ARRAY_ITEMS_NAME) ||
-                                rootList.get(0).getName().equals(JsonNode.ARRAY_OBJECTS_NAME) ||
-                                rootList.get(0).getName().equals(JsonNode.ARRAY_NAME))
-        ) {
-
-            rootElement = convertListItemToElement(rootList.get(0));
-
-        } else {
-            JsonObject jsonObject = new JsonObject();
-            for (ListItem item : rootList) {
-                jsonObject.add(item.getName(), convertListItemToElement(item));
-            }
-            rootElement = jsonObject;
-        }
-
-        return new GsonBuilder().setPrettyPrinting().serializeNulls().create().toJson(rootElement);
+        rootElement = convertJsonNodeToElement(rootNode);
+        GsonBuilder builder = new GsonBuilder().serializeNulls();
+        if (prettyPrint)
+            builder.setPrettyPrinting();
+        return builder.create().toJson(rootElement);
     }
 
-
-    private static JsonElement convertListItemToElement(ListItem item) {
-        if (item.isArray()) {
+    private static JsonElement convertJsonNodeToElement(JsonNode item) {
+        if (item.isArray) {
             JsonArray jsonArray = new JsonArray();
-            for (ArrayList<ListItem> sublist : item.getListObjects()) {
-                if (sublist.size() == 1 && !sublist.get(0).isArray() && !sublist.get(0).isObject()) {
-                    if (sublist.get(0).getName() != null){
+            for (JsonNode subItem : item.children) {
+                if (!subItem.isArray && !subItem.isObject){
+                    if (subItem.key != null){
                         JsonObject obj = new JsonObject();
-                        obj.add(sublist.get(0).getName(),convertListItemToElement(sublist.get(0)));
+                        obj.add(subItem.key, convertJsonNodeToElement(subItem));
                         jsonArray.add(obj);
                         continue;
                     }
 
-                    jsonArray.add(getPrimitive(sublist.get(0)));
+                    jsonArray.add(getPrimitive(subItem));
                     continue;
                 }
-                if (sublist.size() == 1 && sublist.get(0).isArray()) {
-                    jsonArray.add(convertListItemToElement(sublist.get(0)));
+
+                if (subItem.isArray) {
+                    jsonArray.add(convertJsonNodeToElement(subItem));
                     continue;
                 }
 
                 JsonObject obj = new JsonObject();
-                for (ListItem subitem : sublist) {
-                    obj.add(subitem.getName(), convertListItemToElement(subitem));
+                for (JsonNode subitem : subItem.children) {
+                    obj.add(subitem.key, convertJsonNodeToElement(subitem));
                 }
                 jsonArray.add(obj);
             }
             return jsonArray;
         }
 
-        if (item.isObject()) {
+        if (item.isObject) {
             JsonObject jsonObject = new JsonObject();
-            for (ListItem subitem : item.getObjects()) {
-                jsonObject.add(subitem.getName(), convertListItemToElement(subitem));
+            for (JsonNode subitem : item.children) {
+                jsonObject.add(subitem.key, convertJsonNodeToElement(subitem));
             }
             return jsonObject;
         }
@@ -263,9 +252,9 @@ public class JsonFunctions {
 
     }
 
-    private static JsonElement getPrimitive(ListItem item){
+    private static JsonElement getPrimitive(JsonNode item){
 
-        String val = item.getValue();
+        String val = item.value;
 
         if (val == null) return new JsonPrimitive("");
         if ("null".equals(val)) return JsonNull.INSTANCE;
@@ -277,7 +266,7 @@ public class JsonFunctions {
         try { return new JsonPrimitive(Long.parseLong(val)); } catch (NumberFormatException ignored) {}
         try { return new JsonPrimitive(Double.parseDouble(val)); } catch (NumberFormatException ignored) {}
 
-        return new JsonPrimitive(item.getValue());
+        return new JsonPrimitive(item.value);
 
     }
 
