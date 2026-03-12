@@ -43,16 +43,19 @@ public class JsonNode {
                 ",\"isArray\":" + isArray +
                 ",\"isRoot\":" + isRoot +
                 ",\"children\":" + children +
-                ",\"parent\": " + (parent== null? null: "{ \"id\":" + parent.id + "," + parent.getKeyToString() + "}") +
+                ",\"parent\": " + getParentToString() +
                 '}';
     }
 
     public String getKeyToString(){
         return "\"key\":" + (key!=null && !key.startsWith("\"")?"\"":"") +  key + (key!=null && !key.startsWith("\"")?"\"":"");
     }
-
     public String getValueToString(){
         return "\"value\":" + (value!=null && !value.startsWith("\"")?"\"":"") + value + (value!=null && !value.startsWith("\"")?"\"":"");
+    }
+
+    public String getParentToString(){
+        return (parent== null? null: "{ \"id\":" + parent.id + "," + parent.getKeyToString() + "}");
     }
 
 
@@ -78,13 +81,37 @@ public class JsonNode {
 
     @Override
     public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        JsonNode jsonNode = (JsonNode) o;
-        return isObject == jsonNode.isObject && isArray == jsonNode.isArray && isRoot == jsonNode.isRoot && Objects.equals(key, jsonNode.key) && Objects.equals(value, jsonNode.value) && Objects.equals(id, jsonNode.id) && Objects.equals(children, jsonNode.children);
+        if (this == o) return true;
+        if (!(o instanceof JsonNode)) return false;
+
+        JsonNode node = (JsonNode) o;
+
+        int size1 = children == null ? 0 : children.size();
+        int size2 = node.children == null ? 0 : node.children.size();
+
+        return isObject == node.isObject &&
+                isArray == node.isArray &&
+                isRoot == node.isRoot &&
+                size1 == size2 &&
+                Objects.equals(key, node.key) &&
+                Objects.equals(value, node.value) &&
+                Objects.equals(id, node.id) &&
+                Objects.equals(getParentToString(), node.getParentToString());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(key, value, id, isObject, isArray, isRoot, children);
+        int size = children == null ? 0 : children.size();
+
+        return Objects.hash(
+                key,
+                value,
+                getParentToString(),
+                id,
+                isObject,
+                isArray,
+                isRoot,
+                size
+        );
     }
 }

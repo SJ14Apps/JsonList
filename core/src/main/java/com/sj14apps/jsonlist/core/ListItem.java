@@ -42,7 +42,6 @@ public class ListItem {
         return jsonNode.isArray;
     }
 
-    @Deprecated
     public void setIsArray(boolean array) {
         jsonNode.isArray = array;
     }
