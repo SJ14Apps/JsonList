@@ -70,7 +70,7 @@ public class JsonData {
     }
 
     public boolean isEmptyPath(){
-        return currentNode.equals(rootNode); //TODO
+        return rootNode == null || currentNode.equals(rootNode); //TODO
     }
     public void clearPath(){
         path = "";
