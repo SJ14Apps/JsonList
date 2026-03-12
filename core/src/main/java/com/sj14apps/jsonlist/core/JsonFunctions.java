@@ -14,44 +14,39 @@ import java.util.Set;
 
 public class JsonFunctions {
 
-    public static ArrayList<ListItem> getJsonArrayRoot(JsonArray array) {
-        ArrayList<ListItem> mainList = new ArrayList<>();
-        ListItem item = new ListItem();
-        setArrayName(array,item);
-        item.setIsArray(true);
-        item.setListObjects(getJsonArray(array));
-        mainList.add(item);
-        return mainList;
+    public static JsonNode getJsonArrayRoot(JsonArray array) {
+        JsonNode mainNode = new JsonNode().root().array();
+        setArrayName(array,mainNode);
+        mainNode.setChildren(getJsonArray(mainNode,array));
+        return mainNode;
     }
 
-    public static ArrayList<ArrayList<ListItem>> getJsonArray(JsonArray array) {
-        ArrayList<ArrayList<ListItem>> ArrList = new ArrayList<>();
+    public static ArrayList<JsonNode> getJsonArray(JsonNode parentNode, JsonArray array) {
+        ArrayList<JsonNode> ArrList = new ArrayList<>();
         for (int i = 0; i < array.size(); i++) {
             if (array.get(i) instanceof JsonObject) {
-                ArrayList<ListItem> ListOfItems = getJsonObject((JsonObject) array.get(i));
-                ArrList.add(ListOfItems);
+                JsonNode jsonNodeObj = getJsonObject(parentNode, (JsonObject) array.get(i));
+                jsonNodeObj.setId(i);
+                jsonNodeObj.setParent(parentNode);
+                ArrList.add(jsonNodeObj);
                 continue;
             }
             if (array.get(i) instanceof JsonArray){
+                JsonNode jsonNodeArr = new JsonNode().root().array();
 
-                ArrayList<ArrayList<ListItem>> ListOfItems = getJsonArray((JsonArray) array.get(i));
-
-                ArrayList<ListItem> itemsInList = new ArrayList<>();
-                ListItem arrItem = new ListItem();
-
-                setArrayName((JsonArray) array.get(i),arrItem);
-                arrItem.setIsArray(true);
-                arrItem.setListObjects(ListOfItems);
-
-                itemsInList.add(arrItem);
-                ArrList.add(itemsInList);
+                ArrayList<JsonNode> ListOfItems = getJsonArray(jsonNodeArr,(JsonArray) array.get(i));
+                jsonNodeArr.setChildren(ListOfItems);
+                setArrayName((JsonArray) array.get(i),jsonNodeArr);
+                jsonNodeArr.setId(i);
+                jsonNodeArr.setParent(parentNode);
+                ArrList.add(jsonNodeArr);
                 continue;
             }
-            ListItem item = new ListItem();
+            JsonNode item = new JsonNode();
             item.setValue(getStringFromJson(array.get(i).toString()));
-            ArrayList<ListItem> items = new ArrayList<>();
-            items.add(item);
-            ArrList.add(items);
+            item.setId(i);
+            item.setParent(parentNode);
+            ArrList.add(item);
         }
         return ArrList;
     }
@@ -74,34 +69,31 @@ public class JsonFunctions {
         return true;
     }
 
-    public static ArrayList<ListItem> getJsonObject(JsonObject obj) {
-        ArrayList<ListItem> mainList = new ArrayList<>();
+    public static JsonNode getJsonObject(JsonNode parentNode, JsonObject obj) {
+        JsonNode mainNode = new JsonNode().object();
         Set<String> keys = obj.keySet();
         Object[] keysArray = keys.toArray();
 
         for (Object o : keysArray) {
-            ListItem item = new ListItem();
-            item.setName(o.toString());
-            item.setParentList(mainList);
-            setItem(obj,o,item);
-            mainList.add(item);
+            JsonNode item = setItem(obj,o);
+            item.setKey(o.toString());
+            // set the array node as parent instead of object
+            item.setParent(parentNode!= null? parentNode: mainNode);
+            mainNode.children.add(item);
         }
-        return mainList;
+        return mainNode;
     }
 
-    private static void setArrayName(JsonArray array, ListItem item){
+    private static void setArrayName(JsonArray array, JsonNode item){
         if(isArrayOfObjects(array)) {
-            item.setName(ListItem.ARRAY_OBJECTS_NAME);
-            item.setIsRootItem(true);
+            item.setKey(JsonNode.ARRAY_OBJECTS_NAME);
             return;
         }
         if (isArrayOfArray(array)){
-            item.setName(ListItem.ARRAY_NAME);
-            item.setIsRootItem(true);
+            item.setKey(JsonNode.ARRAY_NAME);
             return;
         }
-        item.setName(ListItem.ARRAY_ITEMS_NAME);
-        item.setIsRootItem(true);
+        item.setKey(JsonNode.ARRAY_ITEMS_NAME);
     }
     private static String getStringFromJson(String value){
         String ret = value.startsWith("\"") && value.endsWith("\"") ? value.substring(1,value.length()-1) : value;
@@ -115,47 +107,54 @@ public class JsonFunctions {
                 .replace("\\\\","\\");
     }
 
-    private static void setItem(JsonObject obj, Object o, ListItem item){
+    private static JsonNode setItem(JsonObject obj, Object o){
         if (obj.get(o.toString()) instanceof JsonObject) {
-            item.setIsObject(true);
-            ArrayList<ListItem> objList = getJsonObject((JsonObject) obj.get(o.toString()));
-            item.setObjects(objList);
-            return;
+            return getJsonObject(null,(JsonObject) obj.get(o.toString()));
         }
         if (obj.get(o.toString()) instanceof JsonArray) {
             JsonArray array = (JsonArray) obj.get(o.toString());
-
-            item.setIsArray(true);
-            item.setListObjects(getJsonArray(array));
-            return;
+            JsonNode item = new JsonNode().array();
+            item.setChildren(getJsonArray(item,array));
+            return item;
         }
+        JsonNode item = new JsonNode();
         item.setValue(getStringFromJson(obj.get(o.toString()).toString()));
+        return item;
     }
 
-    static ArrayList<ListItem> getArrayList(ArrayList<ArrayList<ListItem>> list) {
+    static ArrayList<ListItem> getArrayList(ArrayList<JsonNode> list) {
         ArrayList<ListItem> newList = new ArrayList<>();
         ListItem space = new ListItem().Space();
         for (int i = 0; i < list.size(); i++) {
-            setId(list.get(i), i);
-            newList.addAll(list.get(i));
+            if (!list.get(i).isObject){
+                newList.add(new ListItem(list.get(i)));
+                continue;
+            }
+            for (JsonNode node : list.get(i).children) {
+                newList.add(new ListItem(node));
+            }
             newList.add(space);
         }
         return newList;
     }
 
-    private static void setId(ArrayList<ListItem> lists, int id) {
+    static ArrayList<ListItem> getObject(JsonNode obj){
+        ArrayList<ListItem> items = new ArrayList<>();
 
-        for (ListItem listItem : lists) {
-            listItem.setId(id);
+        for (JsonNode node : obj.children){
+            items.add(new ListItem(node));
         }
+
+        return items;
     }
 
-    public static ArrayList<ListItem> getListFromPath(String path, ArrayList<ListItem> rootList) {
+    // TODO No need for new. Rewrite it if needed
+    public static ArrayList<ListItem> getListFromPath(String path, JsonNode rootNode) {
 
 
         String[] pathStrings = path.split("///");
 
-        ArrayList<ListItem> list = rootList;
+        ArrayList<JsonNode> list = rootNode.children;
 
         for (String pathString : pathStrings) {
 
@@ -166,27 +165,31 @@ public class JsonFunctions {
             }
 
             for (int i = 0; i < list.size(); i++){
-                ListItem item = list.get(i);
+                JsonNode item = list.get(i);
 
-                if (item.getName() == null || !item.getName().equals(id != -1 ? pathString.substring(pathString.indexOf("}") + 1) : pathString))
+                if (item.key == null || !item.key.equals(id != -1 ? pathString.substring(pathString.indexOf("}") + 1) : pathString))
                     continue;
 
-                if (id != -1 && item.getId() != id)
+                if (id != -1 && item.id != id)
                     continue;
 
-                if (item.isArray()) {
-                    list = getArrayList(item.getListObjects());
-                    break;
+                if (item.isArray) {
+                    return getArrayList(item.children);
                 }
-                list = list.get(i).getObjects();
-                if (list == null)
-                    list = new ArrayList<>();
-                break;
+                return getObject(item);
             }
         }
-        return list;
+        return new ArrayList<>();
 
     }
+
+    public static ArrayList<ListItem> getListFromNode(JsonNode node){
+        if (node.isArray) {
+            return getArrayList(node.children);
+        }
+        return getObject(node);
+    }
+
 
     public static String getAsPrettyPrint(String data){
         JsonElement json = JsonParser.parseString(data);
@@ -195,63 +198,52 @@ public class JsonFunctions {
     }
 
 
-    public static String convertToRawString(ArrayList<ListItem> rootList) {
+    public static String convertToRawString(JsonNode rootNode) {
+        return convertToRawString(rootNode,true);
+    }
+    public static String convertToRawString(JsonNode rootNode, boolean prettyPrint) {
         JsonElement rootElement;
-
-        if (rootList.size() == 1 && rootList.get(0).isArray() &&
-                (
-                        rootList.get(0).getName().equals(ListItem.ARRAY_ITEMS_NAME) ||
-                                rootList.get(0).getName().equals(ListItem.ARRAY_OBJECTS_NAME) ||
-                                rootList.get(0).getName().equals(ListItem.ARRAY_NAME))
-        ) {
-
-            rootElement = convertListItemToElement(rootList.get(0));
-
-        } else {
-            JsonObject jsonObject = new JsonObject();
-            for (ListItem item : rootList) {
-                jsonObject.add(item.getName(), convertListItemToElement(item));
-            }
-            rootElement = jsonObject;
-        }
-
-        return new GsonBuilder().setPrettyPrinting().serializeNulls().create().toJson(rootElement);
+        rootElement = convertJsonNodeToElement(rootNode);
+        GsonBuilder builder = new GsonBuilder().serializeNulls();
+        if (prettyPrint)
+            builder.setPrettyPrinting();
+        return builder.create().toJson(rootElement);
     }
 
-
-    private static JsonElement convertListItemToElement(ListItem item) {
-        if (item.isArray()) {
+    private static JsonElement convertJsonNodeToElement(JsonNode item) {
+        if (item.isArray) {
             JsonArray jsonArray = new JsonArray();
-            for (ArrayList<ListItem> sublist : item.getListObjects()) {
-                if (sublist.size() == 1 && !sublist.get(0).isArray() && !sublist.get(0).isObject()) {
-                    if (sublist.get(0).getName() != null){
+            for (JsonNode subItem : item.children) {
+                if (!subItem.isArray && !subItem.isObject){
+                    if (subItem.key != null){
                         JsonObject obj = new JsonObject();
-                        obj.add(sublist.get(0).getName(),convertListItemToElement(sublist.get(0)));
+                        obj.add(subItem.key, convertJsonNodeToElement(subItem));
                         jsonArray.add(obj);
                         continue;
                     }
 
-                    jsonArray.add(getPrimitive(sublist.get(0)));
+                    jsonArray.add(getPrimitive(subItem));
                     continue;
                 }
-                if (sublist.size() == 1 && sublist.get(0).isArray()) {
-                    jsonArray.add(convertListItemToElement(sublist.get(0)));
+
+                if (subItem.isArray) {
+                    jsonArray.add(convertJsonNodeToElement(subItem));
                     continue;
                 }
 
                 JsonObject obj = new JsonObject();
-                for (ListItem subitem : sublist) {
-                    obj.add(subitem.getName(), convertListItemToElement(subitem));
+                for (JsonNode subitem : subItem.children) {
+                    obj.add(subitem.key, convertJsonNodeToElement(subitem));
                 }
                 jsonArray.add(obj);
             }
             return jsonArray;
         }
 
-        if (item.isObject()) {
+        if (item.isObject) {
             JsonObject jsonObject = new JsonObject();
-            for (ListItem subitem : item.getObjects()) {
-                jsonObject.add(subitem.getName(), convertListItemToElement(subitem));
+            for (JsonNode subitem : item.children) {
+                jsonObject.add(subitem.key, convertJsonNodeToElement(subitem));
             }
             return jsonObject;
         }
@@ -260,9 +252,9 @@ public class JsonFunctions {
 
     }
 
-    private static JsonElement getPrimitive(ListItem item){
+    private static JsonElement getPrimitive(JsonNode item){
 
-        String val = item.getValue();
+        String val = item.value;
 
         if (val == null) return new JsonPrimitive("");
         if ("null".equals(val)) return JsonNull.INSTANCE;
@@ -274,7 +266,7 @@ public class JsonFunctions {
         try { return new JsonPrimitive(Long.parseLong(val)); } catch (NumberFormatException ignored) {}
         try { return new JsonPrimitive(Double.parseDouble(val)); } catch (NumberFormatException ignored) {}
 
-        return new JsonPrimitive(item.getValue());
+        return new JsonPrimitive(item.value);
 
     }
 

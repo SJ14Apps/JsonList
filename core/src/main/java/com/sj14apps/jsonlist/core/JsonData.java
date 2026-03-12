@@ -5,8 +5,8 @@ import java.util.Stack;
 
 public class JsonData {
     String path = "";
-    ArrayList<ListItem> rootList = new ArrayList<>();
-    ArrayList<ListItem> currentList = new ArrayList<>();
+    JsonNode rootNode;
+    JsonNode currentNode;
     Stack<Integer> previousPosStack = new Stack<>();
     String rawData = "";
     String fileName;
@@ -24,19 +24,32 @@ public class JsonData {
     }
 
     public ArrayList<ListItem> getRootList() {
-        return rootList;
+        if (rootNode.isObject)
+            return JsonFunctions.getObject(rootNode);
+        return JsonFunctions.getArrayList(rootNode.children);
     }
-
-    public void setRootList(ArrayList<ListItem> rootList) {
-        this.rootList = rootList;
-    }
-
     public ArrayList<ListItem> getCurrentList() {
-        return currentList;
+        if (currentNode.isObject)
+            return JsonFunctions.getObject(currentNode);
+        if (currentNode.isArray)
+            return JsonFunctions.getArrayList(currentNode.children);
+        ArrayList<ListItem> items = new ArrayList<>();
+        items.add(new ListItem().error());
+        return items;
     }
 
-    public void setCurrentList(ArrayList<ListItem> currentList) {
-        this.currentList = currentList;
+
+    public JsonNode getRootNode() {
+        return rootNode;
+    }
+    public void setRootNode(JsonNode rootNode) {
+        this.rootNode = rootNode;
+    }
+    public JsonNode getCurrentNode() {
+        return currentNode;
+    }
+    public void setCurrentNode(JsonNode currentNode) {
+        this.currentNode = currentNode;
     }
 
 
@@ -57,7 +70,7 @@ public class JsonData {
     }
 
     public boolean isEmptyPath(){
-        return path.equals("");
+        return rootNode == null || currentNode.equals(rootNode); //TODO
     }
     public void clearPath(){
         path = "";
@@ -69,8 +82,8 @@ public class JsonData {
         return path.split("///");
     }
 
-    public boolean isRootListNull(){
-        return rootList == null;
+    public boolean isRootNodeNull(){
+        return rootNode == null;
     }
 
     public void goBack(){

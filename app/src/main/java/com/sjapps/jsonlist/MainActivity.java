@@ -53,6 +53,7 @@ import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
 
 import com.sj14apps.jsonlist.core.JsonFunctions;
+import com.sj14apps.jsonlist.core.JsonNode;
 import com.sj14apps.jsonlist.core.controllers.SearchController;
 import com.sjapps.about.AboutActivity;
 import com.sjapps.adapters.ListAdapter;
@@ -249,9 +250,7 @@ public class MainActivity extends AppCompatActivity {
             if(canCallBackDispatcher()) getOnBackPressedDispatcher().onBackPressed();
         });
         binding.openFileBtn.setOnClickListener(view -> fileManager.importFromFile());
-        binding.openUrlBtn.setOnClickListener(view -> {
-            showUrlSearchView();
-        });
+        binding.openUrlBtn.setOnClickListener(view -> showUrlSearchView());
 
         binding.titleTxt.setOnClickListener(v -> {
             if (!data.isEmptyPath())
@@ -298,6 +297,10 @@ public class MainActivity extends AppCompatActivity {
         });
         binding.dimLayout.setOnClickListener(view -> open_closeMenu());
         binding.splitViewBtn.setOnClickListener(view -> rawJsonView.toggleSplitView());
+        binding.splitViewBtn.setOnLongClickListener(view -> {
+            ((AndroidRawJsonView) rawJsonView).ShowDebugJson();
+            return true;
+        });
         binding.filterBtn.setOnClickListener(view -> filter());
         binding.searchBtn.setOnClickListener(view -> searchController.showSearchView());
         binding.editBtn.setOnClickListener(view -> editController.toggleEdit());
@@ -432,7 +435,7 @@ public class MainActivity extends AppCompatActivity {
             TransitionManager.endTransitions(binding.content);
             TransitionManager.beginDelayedTransition(binding.content, autoTransition);
             data.goBack();
-            open(JsonData.getPathFormat(data.getPath()), data.getPath(),-1);
+            open(JsonData.getPathFormat(data.getPath()), data.getCurrentNode().parent,-1);
         }
     };
 
@@ -678,6 +681,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    //TODO replace it with open(Title, node, previousPosition)??
     public void open(String Title, String path, int previousPosition) {
         TransitionManager.endTransitions(binding.content);
         TransitionManager.beginDelayedTransition(binding.content, autoTransition);
@@ -694,8 +698,8 @@ public class MainActivity extends AppCompatActivity {
         binding.pathList.setAdapter(pathAdapter);
         data.setPath(path);
         binding.titleTxt.setText(Title);
-        ArrayList<ListItem> arrayList = getListFromPath(path,data.getRootList());
-        data.setCurrentList(arrayList);
+        ArrayList<ListItem> arrayList = getListFromNode(data.getRootNode());
+        data.setCurrentNode(data.getRootNode());
         updateFilterList(arrayList);
         adapter = new ListAdapter(arrayList, this, path);
         binding.list.setAdapter(adapter);
@@ -720,6 +724,47 @@ public class MainActivity extends AppCompatActivity {
             binding.backBtn.setVisibility(VISIBLE);
         } else binding.backBtn.setVisibility(GONE);
 
+    }
+
+    public void open(String Title, JsonNode node, int previousPosition){
+        TransitionManager.endTransitions(binding.content);
+        TransitionManager.beginDelayedTransition(binding.content, autoTransition);
+
+        if (isMenuOpen)
+            open_closeMenu();
+
+        if (binding.emptyListTxt.getVisibility() == VISIBLE)
+            binding.emptyListTxt.setVisibility(GONE);
+
+        String path = "TODO";
+        pathAdapter = new PathListAdapter(this,path);
+        binding.pathList.setAdapter(pathAdapter);
+        data.setPath(path);
+        binding.titleTxt.setText(Title); //TODO
+
+        ArrayList<ListItem> arrayList = getListFromNode(node);
+        data.setCurrentNode(node);
+        updateFilterList(arrayList);
+        adapter = new ListAdapter(arrayList, this, path);
+        binding.list.setAdapter(adapter);
+
+        if (previousPosition == -1) {
+            handler.postDelayed(() -> {
+                if (state.isScrollAnimation()) binding.list.smoothScrollToPosition(data.getPreviousPos()+2);
+                else binding.list.scrollToPosition(data.getPreviousPos()+2);
+                adapter.setHighlightItem(data.getPreviousPos());
+            }, 500);
+            handler.postDelayed(() -> adapter.notifyItemChanged(data.getPreviousPos()), 600);
+        }
+        else data.addPreviousPos(previousPosition);
+
+        if (arrayList.isEmpty()) {
+            binding.emptyListTxt.setVisibility(VISIBLE);
+        }
+        System.out.println("path = " + path);
+        if (!data.isEmptyPath()) {
+            binding.backBtn.setVisibility(VISIBLE);
+        } else binding.backBtn.setVisibility(GONE);
     }
 
     public void highlightItem(int id){
@@ -959,7 +1004,7 @@ public class MainActivity extends AppCompatActivity {
             readFileThread = new Thread(() -> {
                 String dataStr = data.getRawData();
                 if (dataStr.equals("-1"))
-                    dataStr = JsonFunctions.convertToRawString(data.getRootList());
+                    dataStr = JsonFunctions.convertToRawString(data.getRootNode());
 
                 fileManager.writeFile(outputStream, dataStr, fileWriteCallback);
             });
@@ -1100,9 +1145,9 @@ public class MainActivity extends AppCompatActivity {
                 if (binding.searchLL.getVisibility() == VISIBLE)
                     searchController.hideSearchView();
 
-                data.setCurrentList(data.getRootList());
-                updateFilterList(data.getRootList());
-                adapter = new ListAdapter(data.getRootList(), MainActivity.this, "");
+                data.setCurrentNode(data.getRootNode());
+                updateFilterList(data.getRootList()); //TODO
+                adapter = new ListAdapter(data.getCurrentList(), MainActivity.this, "");
                 pathAdapter = new PathListAdapter(MainActivity.this,data.getPath());
                 binding.list.setAdapter(adapter);
                 binding.pathList.setAdapter(pathAdapter);

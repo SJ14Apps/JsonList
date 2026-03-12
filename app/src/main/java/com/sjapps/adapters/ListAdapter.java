@@ -169,7 +169,7 @@ public class ListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
             String newPath = path + (path.equals("") ? "": "///" + (item.getId()!=-1?"{" + item.getId() + "}":"")) + item.getName();
 
-            currentHolder.binding.btn.setOnClickListener(view1 -> activity.open(JsonData.getPathFormat(newPath),newPath,item.getPosition()!=-1?item.getPosition():position));
+            currentHolder.binding.btn.setOnClickListener(view1 -> activity.open(JsonData.getPathFormat(newPath),item.getJsonNode(),item.getPosition()!=-1?item.getPosition():position));
             currentHolder.binding.copyBtn.setOnClickListener(v -> {
                 ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
                 ClipData clipData = ClipData.newPlainText("Text",item.getName());
