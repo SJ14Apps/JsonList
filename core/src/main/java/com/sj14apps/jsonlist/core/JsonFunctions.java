@@ -77,8 +77,9 @@ public class JsonFunctions {
         for (Object o : keysArray) {
             JsonNode item = setItem(obj,o);
             item.setKey(o.toString());
-            // set the array node as parent instead of object
-            item.setParent(parentNode!= null? parentNode: mainNode);
+            // set the array node as parent instead of object TODO not this??? IDK
+//            item.setParent(parentNode!= null? parentNode: mainNode);
+            item.setParent(mainNode);
             mainNode.children.add(item);
         }
         return mainNode;

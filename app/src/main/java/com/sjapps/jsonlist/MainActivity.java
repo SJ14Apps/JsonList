@@ -736,6 +736,11 @@ public class MainActivity extends AppCompatActivity {
         if (binding.emptyListTxt.getVisibility() == VISIBLE)
             binding.emptyListTxt.setVisibility(GONE);
 
+        if (node.isObject && node.parent != null && node.parent.isArray){
+            open(Title,node.parent,previousPosition);
+            return;
+        }
+
         String path = "TODO";
         pathAdapter = new PathListAdapter(this,path);
         binding.pathList.setAdapter(pathAdapter);
@@ -1146,7 +1151,7 @@ public class MainActivity extends AppCompatActivity {
                     searchController.hideSearchView();
 
                 data.setCurrentNode(data.getRootNode());
-                updateFilterList(data.getRootList()); //TODO
+                updateFilterList(data.getRootList());
                 adapter = new ListAdapter(data.getCurrentList(), MainActivity.this, "");
                 pathAdapter = new PathListAdapter(MainActivity.this,data.getPath());
                 binding.list.setAdapter(adapter);
