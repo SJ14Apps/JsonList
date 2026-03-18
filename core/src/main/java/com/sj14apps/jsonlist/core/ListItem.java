@@ -20,6 +20,8 @@ public class ListItem {
 
 
     public String getName() {
+        if (isSpace)
+            return null;
         return jsonNode.key;
     }
 

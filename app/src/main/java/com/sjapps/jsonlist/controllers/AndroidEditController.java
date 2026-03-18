@@ -174,7 +174,7 @@ public class AndroidEditController extends EditController {
                 .onButtonClick(() -> {
                     for (ListItem listItem : activity.adapter.getList()) {
                         if (listItem.getName() != null && listItem.getName().equals(oldName) && listItem != item) {
-                            listItem.setName(name);
+                            listItem.getJsonNode().setKey(name);
                             activity.adapter.notifyItemRangeChanged(0, activity.adapter.getItemCount());
                         }
                     }
