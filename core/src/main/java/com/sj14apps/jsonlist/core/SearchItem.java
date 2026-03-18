@@ -5,20 +5,32 @@ public class SearchItem {
     public String path;
     public int id;
     public int arrayId;
+    public JsonNode node;
 
     public SearchItem(){}
-    public SearchItem(String value, String path){
-        this(value,path,-1);
+    public SearchItem(JsonNode node,String value, String path){
+        this(node,value,path,-1);
     }
 
-    public SearchItem(String value, String path,int id){
-        this(value,path,id,-1);
+    public SearchItem(JsonNode node,String value, String path,int id){
+        this(node,value,path,id,-1);
     }
 
-    public SearchItem(String value, String path,int id,int arrayId){
+    public SearchItem(JsonNode node,String value, String path,int id, int arrayId){
         this.value = value;
         this.path = path;
         this.id = id;
         this.arrayId = arrayId;
+        this.node = node;
+    }
+
+    @Override
+    public String toString() {
+        return "SearchItem{" +
+                "value='" + value + '\'' +
+                ", path='" + path + '\'' +
+                ", id=" + id +
+                ", arrayId=" + arrayId +
+                '}';
     }
 }

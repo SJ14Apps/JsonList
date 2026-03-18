@@ -286,55 +286,35 @@ public class JsonFunctions {
 
     public static ArrayList<SearchItem> searchItem(JsonData data, String val){
         ArrayList<SearchItem> searchItems = new ArrayList<>();
-
-        ArrayList<ListItem> root = data.getRootList();
-        searchItem(root,searchItems,"",val,data.searchMode,0,-1);
+        JsonNode root = data.getRootNode();
+        searchItem(root.children,searchItems,"",val.toLowerCase(),data.searchMode,0,-1);
         return searchItems;
     }
 
-    public static void searchItem(ArrayList<ListItem> list,ArrayList<SearchItem> searchItems, String path, String val,int searchMode,int currentID,int arrayId){
-
-        for (ListItem item : list){
-            if (Thread.currentThread().isInterrupted()){
+    public static void searchItem(ArrayList<JsonNode> nodes,ArrayList<SearchItem> searchItems, String path, String val,int searchMode,int currentID,int arrayId){
+        //TODO  currentID,arrayId? remove?
+        for (JsonNode node : nodes) {
+            if (Thread.currentThread().isInterrupted()) {
                 return;
             }
 
-            if (searchMode != 2 && item.getName() != null && item.getName().toLowerCase().contains(val)){
-                searchItems.add(new SearchItem(item.getName(),path,currentID,arrayId));
-            }
-            if (item.isObject()){
-                searchItem(item.getObjects(),
-                        searchItems,
-                        path + (path.equals("") ? "": "///" + (item.getId()!=-1?"{" + item.getId() + "}":"")) + item.getName(),
-                        val,
-                        searchMode,
-                        0,
-                        -1
-                );
-                currentID++;
-                continue;
-            }
-            if (item.isArray()){
-                int idInArray = 0;
-                int arrayNum = 0;
-                for (ArrayList<ListItem> listItems : item.getListObjects()){
-                    searchItem(listItems,
-                            searchItems,
-                            path + (path.equals("") ? "": "///" + (item.getId()!=-1?"{" + item.getId() + "}":"")) + item.getName(),
-                            val,
-                            searchMode,
-                            idInArray,
-                            arrayNum
-                    );
-                    idInArray += listItems.size()+1;
-                    arrayNum++;
+            if (searchMode != 2 && node.key != null && node.key.toLowerCase().contains(val))
+                searchItems.add(new SearchItem(node, node.key, path, currentID, arrayId));
+
+            if (node.isArray || node.isObject) {
+                if (node.isObject){
+                    searchItem(node.children, searchItems, path + (path.equals("") ? "": "///" ) + (node.key != null? node.key : node.id), val, searchMode, 0,-1);
+                    currentID++;
+                    continue;
                 }
+
+                searchItem(node.children, searchItems, path + (path.equals("") ? "": "///" ) + (node.id != null? node.id +"///": "") + node.key, val, searchMode, currentID,arrayId);
                 currentID++;
                 continue;
             }
-            if (searchMode != 1 && item.getValue() != null && item.getValue().toLowerCase().contains(val)){
-                searchItems.add(new SearchItem((item.getName() != null?item.getName() + ": " :"") + item.getValue(),path,currentID,arrayId));
-            }
+
+            if (searchMode != 1 && node.value.toLowerCase().contains(val))
+                searchItems.add(new SearchItem(node, (node.key != null ? node.key + ": " : "") + node.value, path, currentID, arrayId));
             currentID++;
         }
 
