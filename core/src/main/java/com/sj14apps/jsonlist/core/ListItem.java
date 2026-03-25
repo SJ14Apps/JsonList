@@ -7,9 +7,6 @@ public class ListItem {
     JsonNode jsonNode;
     private boolean isSpace;
     private int position = -1;
-    @Deprecated
-    private ArrayList<ListItem> parentList;
-
 
     public ListItem(){
     }
@@ -88,10 +85,6 @@ public class ListItem {
         return listItems;
     }
 
-    public ArrayList<ArrayList<ListItem>> getListObjects() {
-        return null;
-    }
-
     public JsonNode getJsonNode(){
         return this.jsonNode;
     }
@@ -111,9 +104,6 @@ public class ListItem {
         this.position = position;
     }
 
-    public ArrayList<ListItem> getParentList() {
-        return parentList;
-    }
 
     @Override
     public String toString() {
