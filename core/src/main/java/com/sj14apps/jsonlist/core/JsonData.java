@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Stack;
 
 public class JsonData {
-    String path = "";
+    Path path = new Path();
     JsonNode rootNode;
     JsonNode currentNode;
     Stack<Integer> previousPosStack = new Stack<>();
@@ -15,12 +15,16 @@ public class JsonData {
     public int searchMode = 0;
     static int maxPathNameLength = 3;
 
-    public String getPath() {
-        return path;
+    public String getPathAsString() {
+        return path.toString();
     }
 
-    public void setPath(String path) {
+    public void setPath(Path path) {
         this.path = path;
+    }
+
+    public Path getPath(){
+        return path;
     }
 
     public ArrayList<ListItem> getRootList() {
@@ -73,10 +77,7 @@ public class JsonData {
         return rootNode == null || currentNode.equals(rootNode); //TODO
     }
     public void clearPath(){
-        path = "";
-    }
-    public String[] splitPath(){
-        return path.split("///");
+        path = new Path();
     }
     public static String[] splitPath(String path){
         return path.split("///");
@@ -91,11 +92,7 @@ public class JsonData {
         if (!previousPosStack.isEmpty())
             previousPos = previousPosStack.pop();
 
-        String[] pathStrings = splitPath();
-        clearPath();
-        for (int i = 0; i < pathStrings.length-1; i++) {
-            setPath(path.concat((isEmptyPath()?"":"///") + pathStrings[i]));
-        }
+        path.goBack();
 
     }
 

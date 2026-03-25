@@ -54,6 +54,7 @@ import com.google.android.material.snackbar.Snackbar;
 
 import com.sj14apps.jsonlist.core.JsonFunctions;
 import com.sj14apps.jsonlist.core.JsonNode;
+import com.sj14apps.jsonlist.core.Path;
 import com.sj14apps.jsonlist.core.controllers.SearchController;
 import com.sjapps.about.AboutActivity;
 import com.sjapps.adapters.ListAdapter;
@@ -435,7 +436,7 @@ public class MainActivity extends AppCompatActivity {
             TransitionManager.endTransitions(binding.content);
             TransitionManager.beginDelayedTransition(binding.content, autoTransition);
             data.goBack();
-            open(JsonData.getPathFormat(data.getPath()), data.getCurrentNode().parent,-1);
+            open(JsonData.getPathFormat(data.getPath().toString()), data.getCurrentNode().parent,data.getPath(),-1);
         }
     };
 
@@ -682,7 +683,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //TODO replace it with open(Title, node, previousPosition)??
-    public void open(String Title, String path, int previousPosition) {
+   /* public void open(String Title, String path, int previousPosition) {
         TransitionManager.endTransitions(binding.content);
         TransitionManager.beginDelayedTransition(binding.content, autoTransition);
 
@@ -725,8 +726,8 @@ public class MainActivity extends AppCompatActivity {
         } else binding.backBtn.setVisibility(GONE);
 
     }
-
-    public void open(String Title, JsonNode node, int previousPosition){
+*/
+    public void open(String Title, JsonNode node, Path path, int previousPosition){
         TransitionManager.endTransitions(binding.content);
         TransitionManager.beginDelayedTransition(binding.content, autoTransition);
 
@@ -737,12 +738,11 @@ public class MainActivity extends AppCompatActivity {
             binding.emptyListTxt.setVisibility(GONE);
 
         if (node.isObject && node.parent != null && node.parent.isArray){
-            open(Title,node.parent,previousPosition);
+            open(Title,node.parent,path,previousPosition);
             return;
         }
 
-        String path = "TODO";
-        pathAdapter = new PathListAdapter(this,path);
+        pathAdapter = new PathListAdapter(this,"path");
         binding.pathList.setAdapter(pathAdapter);
         data.setPath(path);
         binding.titleTxt.setText(Title); //TODO
@@ -788,7 +788,7 @@ public class MainActivity extends AppCompatActivity {
             showHidePathList();
         for (int i = 0; i<n; i++)
             data.goBack();
-        open(JsonData.getPathFormat(data.getPath()), data.getPath(),-1);
+        open(JsonData.getPathFormat(data.getPath().toString()),data.getCurrentNode(),data.getPath(),-1);
 
     }
 
@@ -1152,8 +1152,8 @@ public class MainActivity extends AppCompatActivity {
 
                 data.setCurrentNode(data.getRootNode());
                 updateFilterList(data.getRootList());
-                adapter = new ListAdapter(data.getCurrentList(), MainActivity.this, "");
-                pathAdapter = new PathListAdapter(MainActivity.this,data.getPath());
+                adapter = new ListAdapter(data.getCurrentList(), MainActivity.this, new Path());
+                pathAdapter = new PathListAdapter(MainActivity.this,data.getPath().toString());
                 binding.list.setAdapter(adapter);
                 binding.pathList.setAdapter(pathAdapter);
                 binding.fileImg.clearAnimation();

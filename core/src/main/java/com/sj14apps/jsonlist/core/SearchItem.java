@@ -2,7 +2,7 @@ package com.sj14apps.jsonlist.core;
 
 public class SearchItem {
     public String value;
-    public String path;
+    public String path; //TODO Path class instead of String???
     public int id;
     public int arrayId;
     public JsonNode node;
