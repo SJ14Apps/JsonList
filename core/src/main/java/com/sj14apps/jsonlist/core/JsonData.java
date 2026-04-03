@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.Stack;
 
 public class JsonData {
-    String path = "";
-    ArrayList<ListItem> rootList = new ArrayList<>();
-    ArrayList<ListItem> currentList = new ArrayList<>();
+    Path path = new Path();
+    JsonNode rootNode;
+    JsonNode currentNode;
     Stack<Integer> previousPosStack = new Stack<>();
     String rawData = "";
     String fileName;
@@ -15,30 +15,49 @@ public class JsonData {
     public int searchMode = 0;
     static int maxPathNameLength = 3;
 
-    public String getPath() {
-        return path;
+    public String getPathAsString() {
+        return path.toString();
     }
 
-    public void setPath(String path) {
+    public void setPath(Path path) {
         this.path = path;
     }
 
-    public ArrayList<ListItem> getRootList() {
-        return rootList;
+    public Path getPath() {
+        return path;
     }
 
-    public void setRootList(ArrayList<ListItem> rootList) {
-        this.rootList = rootList;
+    public ArrayList<ListItem> getRootList() {
+        if (rootNode.isObject)
+            return JsonFunctions.getObject(rootNode);
+        return JsonFunctions.getArrayList(rootNode.children);
     }
 
     public ArrayList<ListItem> getCurrentList() {
-        return currentList;
+        if (currentNode.isObject)
+            return JsonFunctions.getObject(currentNode);
+        if (currentNode.isArray)
+            return JsonFunctions.getArrayList(currentNode.children);
+        ArrayList<ListItem> items = new ArrayList<>();
+        items.add(new ListItem().error());
+        return items;
     }
 
-    public void setCurrentList(ArrayList<ListItem> currentList) {
-        this.currentList = currentList;
+    public JsonNode getRootNode() {
+        return rootNode;
     }
 
+    public void setRootNode(JsonNode rootNode) {
+        this.rootNode = rootNode;
+    }
+
+    public JsonNode getCurrentNode() {
+        return currentNode;
+    }
+
+    public void setCurrentNode(JsonNode currentNode) {
+        this.currentNode = currentNode;
+    }
 
     public void setRawData(String data) {
         this.rawData = data;
@@ -56,63 +75,62 @@ public class JsonData {
         this.fileName = fileName;
     }
 
-    public boolean isEmptyPath(){
-        return path.equals("");
+    public boolean isEmptyPath() {
+        return rootNode == null || currentNode.equals(rootNode); // TODO
     }
-    public void clearPath(){
-        path = "";
+
+    public void clearPath() {
+        path = new Path();
     }
-    public String[] splitPath(){
-        return path.split("///");
-    }
-    public static String[] splitPath(String path){
+
+    public static String[] splitPath(String path) {
         return path.split("///");
     }
 
-    public boolean isRootListNull(){
-        return rootList == null;
+    public boolean isRootNodeNull() {
+        return rootNode == null;
     }
 
-    public void goBack(){
+    public void goBack() {
 
         if (!previousPosStack.isEmpty())
             previousPos = previousPosStack.pop();
 
-        String[] pathStrings = splitPath();
-        clearPath();
-        for (int i = 0; i < pathStrings.length-1; i++) {
-            setPath(path.concat((isEmptyPath()?"":"///") + pathStrings[i]));
-        }
+        if (path.isEmpty())
+            return;
+
+        path.goBack();
 
     }
 
-    public void addPreviousPos(int pos){
+    public void addPreviousPos(int pos) {
         previousPosStack.push(pos);
     }
 
-    public int getPreviousPos(){
+    public int getPreviousPos() {
         return previousPos;
     }
 
-    public void clearPreviousPos(){
+    public void clearPreviousPos() {
         previousPosStack.clear();
     }
 
-    public static String getPathFormat(String path){
+    public static String getPathFormat(String path) {
         String[] pathStrings = splitPath(path);
         StringBuilder builder = new StringBuilder();
         builder.append(pathStrings.length > maxPathNameLength ? "..." : pathStrings[0]);
 
-        for (int i = pathStrings.length > maxPathNameLength ? pathStrings.length- maxPathNameLength : 1; i < pathStrings.length; i++) {
+        for (int i = pathStrings.length > maxPathNameLength ? pathStrings.length - maxPathNameLength
+                : 1; i < pathStrings.length; i++) {
             builder.append("/").append(getName(pathStrings[i]));
         }
 
         return builder.toString();
     }
 
-    public static String getName(String str){
+    public static String getName(String str) {
         if (str.startsWith("{") && str.contains("}") && str.substring(1, str.indexOf("}")).matches("^[0-9]+"))
-            return str.substring(str.indexOf("}")+1);
+            return str.substring(str.indexOf("}") + 1);
         return str;
     }
 }

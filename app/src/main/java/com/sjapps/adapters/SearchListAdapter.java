@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.sj14apps.jsonlist.core.JsonData;
+import com.sj14apps.jsonlist.core.Path;
 import com.sj14apps.jsonlist.core.SearchItem;
 import com.sjapps.jsonlist.MainActivity;
 import com.sjapps.jsonlist.databinding.ListSearchLayoutBinding;
@@ -71,12 +72,11 @@ public class SearchListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         TextView valTxt = currentHolder.getValTxt();
         TextView pathTxt = currentHolder.getPathTxt();
         valTxt.setText(item.value);
-        String pathStr = "/" + item.path.replace("///","/") + (item.arrayId != -1? "/" + item.arrayId:"");
+        String pathStr = "/" + item.path.replace("///","/") + (item.arrayId != -1? "/" + item.arrayId:""); //TODO Change this idk
         pathTxt.setText(pathStr);
         currentHolder.getBtn().setOnClickListener(v -> {
-            System.out.println("Search: " + item.id);
             activity.searchController.hideSearchView();
-            activity.open(JsonData.getPathFormat(item.path),item.path,-1);
+            activity.open(JsonData.getPathFormat(item.path),item.node.parent,new Path().fromString(item.path),-1);
             activity.highlightItem(item.id);
         });
 
