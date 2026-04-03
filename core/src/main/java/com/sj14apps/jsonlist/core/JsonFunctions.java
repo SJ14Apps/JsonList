@@ -16,8 +16,8 @@ public class JsonFunctions {
 
     public static JsonNode getJsonArrayRoot(JsonArray array) {
         JsonNode mainNode = new JsonNode().root().array();
-        setArrayName(array,mainNode);
-        mainNode.setChildren(getJsonArray(mainNode,array));
+        setArrayName(array, mainNode);
+        mainNode.setChildren(getJsonArray(mainNode, array));
         return mainNode;
     }
 
@@ -31,12 +31,12 @@ public class JsonFunctions {
                 ArrList.add(jsonNodeObj);
                 continue;
             }
-            if (array.get(i) instanceof JsonArray){
+            if (array.get(i) instanceof JsonArray) {
                 JsonNode jsonNodeArr = new JsonNode().root().array();
 
-                ArrayList<JsonNode> ListOfItems = getJsonArray(jsonNodeArr,(JsonArray) array.get(i));
+                ArrayList<JsonNode> ListOfItems = getJsonArray(jsonNodeArr, (JsonArray) array.get(i));
                 jsonNodeArr.setChildren(ListOfItems);
-                setArrayName((JsonArray) array.get(i),jsonNodeArr);
+                setArrayName((JsonArray) array.get(i), jsonNodeArr);
                 jsonNodeArr.setId(i);
                 jsonNodeArr.setParent(parentNode);
                 ArrList.add(jsonNodeArr);
@@ -75,47 +75,48 @@ public class JsonFunctions {
         Object[] keysArray = keys.toArray();
 
         for (Object o : keysArray) {
-            JsonNode item = setItem(obj,o);
+            JsonNode item = setItem(obj, o);
             item.setKey(o.toString());
             // set the array node as parent instead of object TODO not this??? IDK
-//            item.setParent(parentNode!= null? parentNode: mainNode);
+            // item.setParent(parentNode!= null? parentNode: mainNode);
             item.setParent(mainNode);
             mainNode.children.add(item);
         }
         return mainNode;
     }
 
-    private static void setArrayName(JsonArray array, JsonNode item){
-        if(isArrayOfObjects(array)) {
+    private static void setArrayName(JsonArray array, JsonNode item) {
+        if (isArrayOfObjects(array)) {
             item.setKey(JsonNode.ARRAY_OBJECTS_NAME);
             return;
         }
-        if (isArrayOfArray(array)){
+        if (isArrayOfArray(array)) {
             item.setKey(JsonNode.ARRAY_NAME);
             return;
         }
         item.setKey(JsonNode.ARRAY_ITEMS_NAME);
     }
-    private static String getStringFromJson(String value){
-        String ret = value.startsWith("\"") && value.endsWith("\"") ? value.substring(1,value.length()-1) : value;
+
+    private static String getStringFromJson(String value) {
+        String ret = value.startsWith("\"") && value.endsWith("\"") ? value.substring(1, value.length() - 1) : value;
         return ret
-                .replace("\\n","\n")
-                .replace("\\t","\t")
-                .replace("\\r","\r")
-                .replace("\\b","\b")
-                .replace("\\f","\f")
-                .replace("\\\"","\"")
-                .replace("\\\\","\\");
+                .replace("\\n", "\n")
+                .replace("\\t", "\t")
+                .replace("\\r", "\r")
+                .replace("\\b", "\b")
+                .replace("\\f", "\f")
+                .replace("\\\"", "\"")
+                .replace("\\\\", "\\");
     }
 
-    private static JsonNode setItem(JsonObject obj, Object o){
+    private static JsonNode setItem(JsonObject obj, Object o) {
         if (obj.get(o.toString()) instanceof JsonObject) {
-            return getJsonObject(null,(JsonObject) obj.get(o.toString()));
+            return getJsonObject(null, (JsonObject) obj.get(o.toString()));
         }
         if (obj.get(o.toString()) instanceof JsonArray) {
             JsonArray array = (JsonArray) obj.get(o.toString());
             JsonNode item = new JsonNode().array();
-            item.setChildren(getJsonArray(item,array));
+            item.setChildren(getJsonArray(item, array));
             return item;
         }
         JsonNode item = new JsonNode();
@@ -127,7 +128,7 @@ public class JsonFunctions {
         ArrayList<ListItem> newList = new ArrayList<>();
         ListItem space = new ListItem().Space();
         for (int i = 0; i < list.size(); i++) {
-            if (!list.get(i).isObject){
+            if (!list.get(i).isObject) {
                 newList.add(new ListItem(list.get(i)));
                 continue;
             }
@@ -139,10 +140,10 @@ public class JsonFunctions {
         return newList;
     }
 
-    static ArrayList<ListItem> getObject(JsonNode obj){
+    static ArrayList<ListItem> getObject(JsonNode obj) {
         ArrayList<ListItem> items = new ArrayList<>();
 
-        for (JsonNode node : obj.children){
+        for (JsonNode node : obj.children) {
             items.add(new ListItem(node));
         }
 
@@ -151,7 +152,6 @@ public class JsonFunctions {
 
     // TODO No need for new. Rewrite it if needed
     public static ArrayList<ListItem> getListFromPath(String path, JsonNode rootNode) {
-
 
         String[] pathStrings = path.split("///");
 
@@ -165,7 +165,7 @@ public class JsonFunctions {
                 id = Integer.parseInt(pathString.substring(1, pathString.indexOf("}")));
             }
 
-            for (int i = 0; i < list.size(); i++){
+            for (int i = 0; i < list.size(); i++) {
                 JsonNode item = list.get(i);
 
                 if (item.key == null || !item.key.equals(id != -1 ? pathString.substring(pathString.indexOf("}") + 1) : pathString))
@@ -184,24 +184,23 @@ public class JsonFunctions {
 
     }
 
-    public static ArrayList<ListItem> getListFromNode(JsonNode node){
+    public static ArrayList<ListItem> getListFromNode(JsonNode node) {
         if (node.isArray) {
             return getArrayList(node.children);
         }
         return getObject(node);
     }
 
-
-    public static String getAsPrettyPrint(String data){
+    public static String getAsPrettyPrint(String data) {
         JsonElement json = JsonParser.parseString(data);
         Gson gson = new Gson().newBuilder().setPrettyPrinting().serializeNulls().create();
         return gson.toJson(json);
     }
 
-
     public static String convertToRawString(JsonNode rootNode) {
-        return convertToRawString(rootNode,true);
+        return convertToRawString(rootNode, true);
     }
+
     public static String convertToRawString(JsonNode rootNode, boolean prettyPrint) {
         JsonElement rootElement;
         rootElement = convertJsonNodeToElement(rootNode);
@@ -215,8 +214,8 @@ public class JsonFunctions {
         if (item.isArray) {
             JsonArray jsonArray = new JsonArray();
             for (JsonNode subItem : item.children) {
-                if (!subItem.isArray && !subItem.isObject){
-                    if (subItem.key != null){
+                if (!subItem.isArray && !subItem.isObject) {
+                    if (subItem.key != null) {
                         JsonObject obj = new JsonObject();
                         obj.add(subItem.key, convertJsonNodeToElement(subItem));
                         jsonArray.add(obj);
@@ -253,7 +252,7 @@ public class JsonFunctions {
 
     }
 
-    private static JsonElement getPrimitive(JsonNode item){
+    private static JsonElement getPrimitive(JsonNode item) {
 
         String val = item.value;
 
@@ -261,7 +260,7 @@ public class JsonFunctions {
         if ("null".equals(val)) return JsonNull.INSTANCE;
         if ("true".equals(val)) return new JsonPrimitive(true);
         if ("false".equals(val)) return new JsonPrimitive(false);
-        
+
         if (hasInvalidLeadingZero(val)) return new JsonPrimitive(val);
           
         try { return new JsonPrimitive(Long.parseLong(val)); } catch (NumberFormatException ignored) {}
@@ -285,10 +284,10 @@ public class JsonFunctions {
         return false;
     }
 
-    public static ArrayList<SearchItem> searchItem(JsonData data, String val){
+    public static ArrayList<SearchItem> searchItem(JsonData data, String val) {
         ArrayList<SearchItem> searchItems = new ArrayList<>();
         JsonNode root = data.getRootNode();
-        searchItem(root.children,searchItems,"",val.toLowerCase(),data.searchMode,0,-1);
+        searchItem(root.children, searchItems, "", val.toLowerCase(), data.searchMode, 0, -1);
         return searchItems;
     }
 
@@ -303,22 +302,65 @@ public class JsonFunctions {
                 searchItems.add(new SearchItem(node, node.key, path, currentID, arrayId));
 
             if (node.isArray || node.isObject) {
-                if (node.isObject){
-                    searchItem(node.children, searchItems, path + (path.equals("") ? "": "///" ) + (node.key != null? node.key : node.id), val, searchMode, 0,-1);
+                if (node.isObject) {
+                    searchItem(
+                            node.children,
+                            searchItems,
+                            path + (path.equals("") ? "" : "///") + (node.key != null ? node.key : node.id),
+                            val,
+                            searchMode,
+                            0,
+                            -1
+                    );
                     currentID++;
                     continue;
                 }
 
-                searchItem(node.children, searchItems, path + (path.equals("") ? "": "///" ) + (node.id != null? node.id +"///": "") + node.key, val, searchMode, currentID,arrayId);
+                searchItem(
+                        node.children,
+                        searchItems,
+                        path + (path.equals("") ? "" : "///") + (node.id != null ? node.id + "///" : "") + node.key,
+                        val,
+                        searchMode,
+                        currentID,
+                        arrayId
+                );
                 currentID++;
                 continue;
             }
 
             if (searchMode != 1 && node.value.toLowerCase().contains(val))
-                searchItems.add(new SearchItem(node, (node.key != null ? node.key + ": " : "") + node.value, path, currentID, arrayId));
+                searchItems.add(new SearchItem(
+                        node,
+                        (node.key != null ? node.key + ": " : "") + node.value,
+                        path,
+                        currentID,
+                        arrayId
+                ));
             currentID++;
         }
 
     }
 
+    public static JsonNode getNodeFromPath(JsonNode rootNode, Path path) {
+        if (path == null)
+            return rootNode;
+        JsonNode current = rootNode;
+        for (PathSegment segment : path.pathSegments) {
+            current = getChildren(current, segment);
+        }
+        return current;
+    }
+
+    public static JsonNode getChildren(JsonNode parent, PathSegment segment) {
+        if (parent == null || parent.children == null)
+            return parent;
+        for (JsonNode node : parent.children) {
+            if (segment.isId && node.id != null && node.id == Integer.parseInt(segment.val))
+                return node;
+            if (node.key != null && node.key.equals(segment.val))
+                return node;
+        }
+        return parent;
+    }
 }

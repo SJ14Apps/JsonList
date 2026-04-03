@@ -742,7 +742,7 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        pathAdapter = new PathListAdapter(this,"path");
+        pathAdapter = new PathListAdapter(this,path);
         binding.pathList.setAdapter(pathAdapter);
         data.setPath(path);
         binding.titleTxt.setText(Title); //TODO
@@ -788,6 +788,7 @@ public class MainActivity extends AppCompatActivity {
             showHidePathList();
         for (int i = 0; i<n; i++)
             data.goBack();
+        data.setCurrentNode(JsonFunctions.getNodeFromPath(data.getRootNode(),data.getPath()));
         open(JsonData.getPathFormat(data.getPath().toString()),data.getCurrentNode(),data.getPath(),-1);
 
     }
@@ -1153,7 +1154,7 @@ public class MainActivity extends AppCompatActivity {
                 data.setCurrentNode(data.getRootNode());
                 updateFilterList(data.getRootList());
                 adapter = new ListAdapter(data.getCurrentList(), MainActivity.this, new Path());
-                pathAdapter = new PathListAdapter(MainActivity.this,data.getPath().toString());
+                pathAdapter = new PathListAdapter(MainActivity.this,data.getPath());
                 binding.list.setAdapter(adapter);
                 binding.pathList.setAdapter(pathAdapter);
                 binding.fileImg.clearAnimation();
