@@ -77,7 +77,6 @@ public class SearchListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         currentHolder.getBtn().setOnClickListener(v -> {
             activity.searchController.hideSearchView();
             Path newPath = item.path.copy();
-            if (!newPath.isEmpty()) newPath.goBack();
             activity.open(newPath.getFormattedTitle(),item.node.parent,newPath,-1);
             activity.highlightItem(item.id);
         });
